@@ -7,7 +7,7 @@ public class XTank
 {
 	public static void main(String[] args) throws Exception 
     {
-        try (var socket = new Socket("127.0.0.1", 59896)) 
+        try (var socket = new Socket("172.20.10.2", 12396)) 
         {
         	DataInputStream in = new DataInputStream(socket.getInputStream());
         	DataOutputStream out = new DataOutputStream(socket.getOutputStream());
