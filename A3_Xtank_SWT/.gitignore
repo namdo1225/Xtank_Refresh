@@ -11,3 +11,12 @@
 /HostScreen.class
 /MenuScreen.class
 /Screen.class
+/ClientController.class
+/ClientModel.class
+/HostController.class
+/HostModel.class
+/Mode.class
+/XTank2.class
+/XTankServer2$XTankManager.class
+/XTankServer2.class
+/XTankUI2.class

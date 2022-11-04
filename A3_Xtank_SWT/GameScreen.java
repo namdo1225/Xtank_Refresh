@@ -5,6 +5,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -21,10 +22,10 @@ public class GameScreen extends Screen {
 	private Composite 		compositeGame;
 	private Label			fill;
 	
-	private GridLayout layout;
+	private GridLayout		layout;
 	
-	public GameScreen(Shell shell, Display display) {
-		super(shell, display);
+	public GameScreen(Shell shell, Display display, ClientController cCon, HostController hCon) {
+		super(shell, display, cCon, hCon);
 	}
 	
 	@Override
@@ -43,16 +44,23 @@ public class GameScreen extends Screen {
 		quit.setText("Quit");
 		quit.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> System.out.println("Pressed")));
 		
-		compositeGame = new Composite(composite, SWT.COLOR_WHITE);
+		compositeGame = new Composite(composite, SWT.COLOR_BLACK);
+		compositeGame.setLayout(new FillLayout(SWT.VERTICAL));
 		
 		fill = new Label(compositeGame, SWT.BALLOON);
-		fill.setText("FILFEWFEIWOJWEIROPEWIOEW");
+		fill.setText("FILFEWFEIWO\nJWEIROPEWIOEW");
 		fill.setFont(new Font(display,"Times New Roman", 48, SWT.BOLD ));
 		fill.setAlignment(SWT.LEFT);
-		
+		fill.setSize(100, 600);
 		
 		layout = new GridLayout();
 		layout.numColumns = 3;
+	
+		GridData data = new GridData();
+		data.horizontalSpan = 2;
+		
+		compositeGame.setLayoutData(data);
+		
 		composite.setLayout(layout);
 		
 		return composite;

@@ -20,9 +20,10 @@ public class HostScreen extends Screen {
 	
 	private Button		update;
 	private Button		next;
+	private Button		back;
 	
-	public HostScreen(Shell shell, Display display) {
-		super(shell, display);
+	public HostScreen(Shell shell, Display display, ClientController cCon, HostController hCon) {
+		super(shell, display, cCon, hCon);
 	}
 	
 	@Override
@@ -51,20 +52,37 @@ public class HostScreen extends Screen {
 		
 		update = new Button(composite, SWT.PUSH);
 		update.setText("Update");
-		update.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> validateInput()));
+		update.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> hostServer()));
 		
 		next = new Button(composite, SWT.PUSH);
 		next.setText("Next");
 		next.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> validateInput()));
+		
+		back = new Button(composite, SWT.PUSH);
+		back.setText("Back");
+		back.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> hControl.updateScreen(Mode.MAIN)));
 		
 		composite.setLayout(new FillLayout(SWT.VERTICAL));
 		
 		return composite;
 	}
 
-	private void validateInput() {		
+	private void hostServer() {
+		if (validateInput())
+			try {
+				hControl.createServerSocket(Integer.parseInt(port.getText()));
+			} catch (Exception e) {}
+	}
+	
+	private boolean validateInput() {		
+		if (port.getText().isBlank())
+			return false;
+		
 		int portNum = Integer.parseInt(port.getText());
 		if (portNum < 0 || portNum > 65535)
-			return;
+			return false;
+		return true;
 	}
 }

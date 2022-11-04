@@ -15,8 +15,8 @@ public class MenuScreen extends Screen {
 	private Button		mainHost;
 	private Button		mainExit;
 
-	public MenuScreen(Shell shell, Display display) {
-		super(shell, display);
+	public MenuScreen(Shell shell, Display display, ClientController cCon, HostController hCon) {
+		super(shell, display, cCon, hCon);
 	}
 
 	protected Composite makeComposite(Shell shell, Display display) {
@@ -29,18 +29,26 @@ public class MenuScreen extends Screen {
 		
 		mainJoin = new Button(composite, SWT.PUSH);
 		mainJoin.setText("Join Game");
-		mainJoin.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> System.out.println("Pressed")));
+		mainJoin.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> cControl.updateScreen(Mode.JOIN)));
 		
 		mainHost = new Button(composite, SWT.PUSH);
 		mainHost.setText("Host Game");
-		mainHost.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> System.out.println("Pressed")));
+		mainHost.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> makeServer()));
 		
 		mainExit = new Button(composite, SWT.PUSH);
 		mainExit.setText("Exit Game");
-		mainExit.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> System.exit(0)));
+		mainExit.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> System.exit(0)));
 
 		composite.setLayout(new FillLayout(SWT.VERTICAL));
 		
 		return composite;
+	}
+	
+	private void makeServer() {
+		hControl.updateScreen(Mode.HOST);
+		hControl.createServerSocket(8080);
 	}
 }

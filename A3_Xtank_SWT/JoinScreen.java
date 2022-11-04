@@ -1,4 +1,8 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.eclipse.swt.SWT;
@@ -23,8 +27,8 @@ public class JoinScreen extends Screen {
 	private Button		next;
 	private Button		back;
 	
-	public JoinScreen(Shell shell, Display display) {
-		super(shell, display);
+	public JoinScreen(Shell shell, Display display, ClientController cCon, HostController hCon) {
+		super(shell, display, cCon, hCon);
 	}
 	
 	protected Composite makeComposite(Shell shell, Display display) {
@@ -43,38 +47,48 @@ public class JoinScreen extends Screen {
 		title.setAlignment(SWT.CENTER);
 		
 		iP = new Text(composite, SWT.LEFT | SWT.BORDER);
-		iP.setMessage("Enter IPv4 address");
+		iP.setMessage("Enter IPv4 address:");
 		
 		port = new Text(composite, SWT.LEFT | SWT.BORDER);
-		port.setMessage("Enter port number");
+		port.setMessage("Enter port number:");
 		
 		next = new Button(composite, SWT.PUSH);
 		next.setText("Next");
-		next.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> validateInput()));
+		next.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> joinServer()));
 		
 		back = new Button(composite, SWT.PUSH);
 		back.setText("Back");
-		back.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> System.out.println("Pressed")));
+		back.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> cControl.updateScreen(Mode.MAIN)));
 		
 		composite.setLayout(new FillLayout(SWT.VERTICAL));
 		
 		return composite;
 	}
 	
-	private void validateInput() {
+	private void joinServer() {
+		if (validateInput())
+			try {
+				cControl.createSocket(iP.getText(), Integer.parseInt(port.getText()));
+			} catch (Exception e) {}
+	}
+	
+	private boolean validateInput() {
 		String[] fourHex = iP.getText().split("\\.");
 		
 		if (fourHex.length != 4)
-			return;
+			return false;
 		
 		for (int i = 0; i < 4; i++) {
 			int partIP = Integer.parseInt(fourHex[i]);
 			if (partIP < 0 || partIP > 255)
-				return;
+				return false;
 		}
 		
 		int portNum = Integer.parseInt(port.getText());
 		if (portNum < 0 || portNum > 65535)
-			return;
+			return false;
+		return true;
 	}
 }
