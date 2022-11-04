@@ -1,5 +1,7 @@
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executors;
@@ -11,19 +13,19 @@ import java.util.ArrayList;
 /**
  * When a client connects, a new thread is started to handle it.
  */
-public class XTankServer 
+public class Server 
 {
-	static ArrayList<DataOutputStream> sq;
+	static ArrayList<ObjectOutputStream> sq;
 	
     public static void main(String[] args) throws Exception 
     {
-		System.out.println(InetAddress.getLocalHost());
+		//System.out.println(InetAddress.getLocalHost());
 		sq = new ArrayList<>();
 		
-        try (var listener = new ServerSocket(59896)) 
+        try (var listener = new ServerSocket(12346)) 
         {
-            System.out.println("The XTank server is running...");
-            var pool = Executors.newFixedThreadPool(20);
+            //System.out.println("The XTank server is running...");
+            var pool = Executors.newFixedThreadPool(19);
             while (true) 
             {
                 pool.execute(new XTankManager(listener.accept()));
@@ -41,29 +43,35 @@ public class XTankServer
         public void run() 
         {
             System.out.println("Connected: " + socket);
+            ObjectOutputStream out = null;
             try 
             {
-            	DataInputStream in = new DataInputStream(socket.getInputStream());
-            	DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            	out = new ObjectOutputStream(socket.getOutputStream());
+            	out.flush();
+            	out.writeObject(new InputPacket(69, 0, 1, 0));
+            	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+            	System.out.println("cat");
+            	
                 sq.add(out);
-                int ycoord;
                 while (true)
                 {
-                	ycoord = in.readInt();
-                	//System.out.println("ycoord = " + ycoord);
-                	for (DataOutputStream o: sq)
+                	InputPacket input = (InputPacket)in.readObject();
+                	System.out.println(input.y == 1);
+                	for (ObjectOutputStream o: sq)
                 	{
-                    	//System.out.println("o = " + o);
-    					o.writeInt(ycoord);
+                    	System.out.println("o = " + o);
+    					o.writeObject(input);
+    					o.flush();
                 	}
                 }
-            } 
+            }
             catch (Exception e) 
             {
                 System.out.println("Error:" + socket);
             } 
             finally 
             {
+            	sq.remove(out);
                 try { socket.close(); } 
                 catch (IOException e) {}
                 System.out.println("Closed: " + socket);

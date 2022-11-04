@@ -7,6 +7,13 @@ import org.eclipse.swt.widgets.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.ByteBuffer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class XTankUI
 {
@@ -19,10 +26,13 @@ public class XTankUI
 	private Canvas canvas;
 	private Display display;
 	
-	DataInputStream in; 
-	DataOutputStream out;
+	private ObjectInputStream in; 
+	private ObjectOutputStream out;
 	
-	public XTankUI(DataInputStream in, DataOutputStream out)
+	private Lock position_lock = new ReentrantLock();
+	private ExecutorService pool;
+	
+	public XTankUI(ObjectInputStream in, ObjectOutputStream out)
 	{
 		this.in = in;
 		this.out = out;
@@ -30,12 +40,34 @@ public class XTankUI
 	
 	public void start()
 	{
+		System.out.println("1");
+		
 		display = new Display();
 		Shell shell = new Shell(display);
 		shell.setText("xtank");
 		shell.setLayout(new FillLayout());
 
 		canvas = new Canvas(shell, SWT.NO_BACKGROUND);
+		Runner runnable = new Runner();
+		
+		System.out.println("2");
+		
+		shell.addListener(SWT.Close, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				try {
+					in.close();
+					out.close();
+					runnable.stop();
+						
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				shell.dispose();
+				display.dispose();
+			}
+		});
 
 		canvas.addPaintListener(event -> {
 			event.gc.fillRectangle(canvas.getBounds());
@@ -49,7 +81,15 @@ public class XTankUI
 
 		canvas.addMouseListener(new MouseListener() {
 			public void mouseDown(MouseEvent e) {
-				System.out.println("mouseDown in canvas");
+				//System.out.println("mouseDown in canvas");
+				try {
+					System.out.println(in.available());
+					InputPacket packet = (InputPacket)in.readObject();
+					System.out.println(packet.y == 1);
+				} catch (ClassNotFoundException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			} 
 			public void mouseUp(MouseEvent e) {} 
 			public void mouseDoubleClick(MouseEvent e) {} 
@@ -57,12 +97,14 @@ public class XTankUI
 
 		canvas.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
+				InputPacket packet = new InputPacket(0);
+				packet.y = 1;
 				//System.out.println("key " + e.character);
 				// update tank location
-				x += directionX;
-				y += directionY;
+				//x += directionX;
+				//y += directionY;
 				try {
-					out.writeInt(y);
+					out.writeObject(packet);
 				}
 				catch(IOException ex) {
 					System.out.println("The server did not respond (write KL).");
@@ -73,38 +115,66 @@ public class XTankUI
 			public void keyReleased(KeyEvent e) {}
 		});
 
+		System.out.println("3");
+		
 		try {
-			out.writeInt(y);
+			InputPacket test = new InputPacket(0);
+			out.writeObject(test);
 		}
 		catch(IOException ex) {
 			System.out.println("The server did not respond (initial write).");
-		}				
-		Runnable runnable = new Runner();
-		display.asyncExec(runnable);
+		}	
+		
+		System.out.println("4");
+		
+		
+		pool = Executors.newFixedThreadPool(1);
+		pool.execute(runnable);
+		//display.asyncExec(runnable);
 		shell.open();
 		while (!shell.isDisposed()) 
 			if (!display.readAndDispatch())
 				display.sleep();
 
-		display.dispose();		
+		display.dispose();
+		
+		System.out.println("5");
 	}
 	
 	class Runner implements Runnable
 	{
+		private boolean terminate;
+		
+		public void stop() {
+			terminate = true;
+		}
+		
 		public void run() 
 		{
-			try {
-				if (in.available() > 0)
-				{
-					y = in.readInt();
-					//System.out.println("y = " + y);
-					canvas.redraw();
+			terminate = false;
+			while (!terminate) {
+				try {
+					if (in.available() > 0 || true)
+					{
+						// read in only other tanks and shots
+						InputPacket packet = null;
+						try {
+							packet = (InputPacket)in.readObject();
+						} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						if (packet.y == 1) {
+							y += 2;
+						}
+						//canvas.redraw();
+					}
 				}
+				catch(IOException ex) {
+					System.out.println("The server did not respond (async).");
+				}				
+		        //display.timerExec(150, this);
 			}
-			catch(IOException ex) {
-				System.out.println("The server did not respond (async).");
-			}				
-            display.timerExec(150, this);
 		}
 	};	
 }
