@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
@@ -32,10 +33,15 @@ public class XTankUI
 	private Lock position_lock = new ReentrantLock();
 	private ExecutorService pool;
 	
-	public XTankUI(ObjectInputStream in, ObjectOutputStream out)
+	private ArrayList<Tank> tanks; // TODO: change to map
+	private Tank tank;
+	
+	public XTankUI(ObjectInputStream in, ObjectOutputStream out, Tank tank)
 	{
 		this.in = in;
 		this.out = out;
+		this.tank = tank;
+		tanks = new ArrayList<>();
 	}
 	
 	public void start()
@@ -72,11 +78,11 @@ public class XTankUI
 		canvas.addPaintListener(event -> {
 			event.gc.fillRectangle(canvas.getBounds());
 			event.gc.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-			event.gc.fillRectangle(x, y, 50, 100);
+			event.gc.fillRectangle(tank.getX(), tank.getY(), 50, 100);
 			event.gc.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_BLACK));
-			event.gc.fillOval(x, y+25, 50, 50);
+			event.gc.fillOval(tank.getX(), tank.getY()+25, 50, 50);
 			event.gc.setLineWidth(4);
-			event.gc.drawLine(x+25, y+25, x+25, y-15);
+			event.gc.drawLine(tank.getX()+25, tank.getY()+25, tank.getX()+25, tank.getY()-15);
 		});	
 
 		canvas.addMouseListener(new MouseListener() {
@@ -98,7 +104,20 @@ public class XTankUI
 		canvas.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
 				InputPacket packet = new InputPacket(0);
-				packet.y = 1;
+				switch (e.character) {
+				case 'w':
+					packet.y = -1;
+					break;
+				case 's':
+					packet.y = 1;
+					break;
+				case 'a':
+					packet.x = -1;
+					break;
+				case 'd':
+					packet.x = 1;
+					break;
+				}
 				//System.out.println("key " + e.character);
 				// update tank location
 				//x += directionX;
@@ -141,6 +160,10 @@ public class XTankUI
 		System.out.println("5");
 	}
 	
+	public void addTank(Tank tank) {
+		tanks.add(tank);
+	}
+	
 	class Runner implements Runnable
 	{
 		private boolean terminate;
@@ -164,9 +187,11 @@ public class XTankUI
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						if (packet.y == 1) {
-							y += 2;
+						// used if new tank added after this local tank was added
+						if (packet.id >= tanks.size()) {
+							tanks.add(new Tank(packet.x, packet.y, packet.id));
 						}
+						tank.set(packet.x, packet.y, 0);
 						//canvas.redraw();
 					}
 				}

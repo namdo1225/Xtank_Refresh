@@ -1,0 +1,46 @@
+
+public class Tank {
+
+	private int x;
+	private int y;
+	private int rotate;
+	private int id;
+	
+	public Tank(int x, int y, int id) {
+		this.x = x;
+		this.y = y;
+		this.rotate = 0;
+		this.id = id;
+	}
+	
+	public void move(int x, int y) {
+		this.x += x;
+		this.y += y;
+	}
+	
+	public void set(int x, int y, int rotate) {
+		this.x = x;
+		this.y = y;
+		this.rotate = rotate;
+	}
+	
+	public void rotate(int rotate) {
+		this.rotate = rotate;
+	}
+	
+	public int getX() {
+		return x;
+	}
+	
+	public int getY() {
+		return y;
+	}
+	
+	public int getRotate() {
+		return rotate;
+	}
+	
+	public int getID() {
+		return id;
+	}
+}

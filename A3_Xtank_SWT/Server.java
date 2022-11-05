@@ -16,12 +16,13 @@ import java.util.ArrayList;
 public class Server 
 {
 	static ArrayList<ObjectOutputStream> sq;
+	static ArrayList<Tank> tanks; // TODO: change to map
 	
     public static void main(String[] args) throws Exception 
     {
 		//System.out.println(InetAddress.getLocalHost());
 		sq = new ArrayList<>();
-		
+		tanks = new ArrayList<>();
         try (var listener = new ServerSocket(12346)) 
         {
             //System.out.println("The XTank server is running...");
@@ -48,19 +49,29 @@ public class Server
             {
             	out = new ObjectOutputStream(socket.getOutputStream());
             	out.flush();
-            	out.writeObject(new InputPacket(69, 0, 1, 0));
+            	int initial_x = 0;
+            	int initial_y = 0;
+            	out.writeObject(new InputPacket(tanks.size(), initial_x, initial_y, 0));
             	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             	System.out.println("cat");
             	
                 sq.add(out);
+                tanks.add(new Tank(initial_x, initial_y, tanks.size()));
+                
                 while (true)
                 {
                 	InputPacket input = (InputPacket)in.readObject();
+                	// update tank position server side
+                	final int SPEED = 5;
+                	tanks.get(input.id).move(input.x * SPEED, input.y * SPEED);
                 	System.out.println(input.y == 1);
                 	for (ObjectOutputStream o: sq)
                 	{
                     	System.out.println("o = " + o);
-    					o.writeObject(input);
+                    	InputPacket to_client = new InputPacket(input.id, 
+                    			tanks.get(input.id).getX(), tanks.get(input.id).getY(), 0);
+                    	
+    					o.writeObject(to_client);
     					o.flush();
                 	}
                 }
@@ -72,6 +83,7 @@ public class Server
             finally 
             {
             	sq.remove(out);
+            	tanks.remove(tanks.size() - 1);
                 try { socket.close(); } 
                 catch (IOException e) {}
                 System.out.println("Closed: " + socket);
