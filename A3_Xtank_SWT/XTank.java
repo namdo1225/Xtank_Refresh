@@ -7,24 +7,23 @@ import java.io.ObjectOutputStream;
 
 public class XTank 
 {
-	public static void main(String[] args) throws Exception 
-    {
-        try (var socket = new Socket("127.0.0.1", 8080)) 
-        {
-        	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-        	ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-        	out.flush();
-        	InputPacket new_tank = null;
-        	try {
-        		new_tank = (InputPacket)in.readObject();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        	Tank tank = new Tank(new_tank.x, new_tank.y, new_tank.id);
-        	var ui = new XTankUI(in, out, tank);
-            ui.start();
-        }
+	public static void main(String[] args) throws Exception  {
+		XTankUI ui = XTankUI.get();
+		ClientModel cModel = new ClientModel();
+		ClientController cController = new ClientController();
+		
+		HostModel hModel = new HostModel();
+		HostController hController = new HostController();
+		
+		ui.setClientMVC(cModel, cController);
+		cController.setMVC(cModel);
+		cModel.setMVC(ui);
+		
+		ui.setHostMVC(hModel, hController);
+		hController.setMVC(hModel);
+		hModel.setMVC(ui);
+		
+		ui.start();
     }
 }
 

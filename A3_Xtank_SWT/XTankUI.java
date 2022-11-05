@@ -18,55 +18,46 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class XTankUI
 {
-	// The location and direction of the "tank"
-	private int x = 300;
-	private int y = 500;
-	private int directionX = 0;
-	private int directionY = -10;
+	private static XTankUI			ui;
+	private Display					display;
+	private Shell					shell;
+	
+	private ClientModel				clientModel;
+	private ClientController		clientControl;
+	
+	private HostModel				hostModel;
+	private HostController			hostControl;
+	
+	private	Screen[]				screens;
+	private GridData[]				gridDatas;
 
-	private Canvas canvas;
-	private Display display;
+	private GridLayout				layout;
 	
-	private ObjectInputStream in; 
-	private ObjectOutputStream out;
-	
-	private Lock position_lock = new ReentrantLock();
-	private ExecutorService pool;
-	
-	private ArrayList<Tank> tanks; // TODO: change to map
-	private Tank tank;
-	
-	public XTankUI(ObjectInputStream in, ObjectOutputStream out, Tank tank)
-	{
-		this.in = in;
-		this.out = out;
-		this.tank = tank;
-		tanks = new ArrayList<>();
+	public synchronized static XTankUI get() {
+		if (ui == null)
+			ui = new XTankUI();
+		return ui;
 	}
-	
-	public void start()
-	{
-		System.out.println("1");
 		
+	public void start() {
 		display = new Display();
-		Shell shell = new Shell(display);
-		shell.setText("xtank");
-		shell.setLayout(new FillLayout());
-
-		canvas = new Canvas(shell, SWT.NO_BACKGROUND);
-		Runner runnable = new Runner();
+		shell = new Shell(display);
+		shell.setText("A3_XTank");
 		
-		System.out.println("2");
+		layout = new GridLayout();
+		layout.numColumns = 1;
+		shell.setLayout(layout);
+		shell.setBackground(null);
 		
 		shell.addListener(SWT.Close, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				try {
-					in.close();
-					out.close();
-					runnable.stop();
+					clientControl.closeInput();
+					clientControl.closeOutput();
+					clientControl.stopRunnable();
 						
-				} catch (IOException e) {
+				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -74,124 +65,63 @@ public class XTankUI
 				display.dispose();
 			}
 		});
+		
+		screens = new Screen[4];
+		gridDatas = new GridData[4];
+		
+		screens[0] = new MenuScreen(shell, display, clientControl, hostControl, clientModel, hostModel);
+		screens[1] = new JoinScreen(shell, display, clientControl, hostControl, clientModel, hostModel);
+		screens[2] = new HostScreen(shell, display, clientControl, hostControl, clientModel, hostModel);
+		screens[3] = new GameScreen(shell, display, clientControl, hostControl, clientModel, hostModel);
+		
+		for (int i = 0; i < gridDatas.length; i++) {
+			gridDatas[i] = new GridData();
+			gridDatas[i].horizontalAlignment = GridData.FILL;
+			gridDatas[i].grabExcessHorizontalSpace = true;
 
-		canvas.addPaintListener(event -> {
-			event.gc.fillRectangle(canvas.getBounds());
-			event.gc.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-			event.gc.fillRectangle(tank.getX(), tank.getY(), 50, 100);
-			event.gc.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_BLACK));
-			event.gc.fillOval(tank.getX(), tank.getY()+25, 50, 50);
-			event.gc.setLineWidth(4);
-			event.gc.drawLine(tank.getX()+25, tank.getY()+25, tank.getX()+25, tank.getY()-15);
-		});	
-
-		canvas.addMouseListener(new MouseListener() {
-			public void mouseDown(MouseEvent e) {
-				System.out.println("mouseDown in canvas");
-			} 
-			public void mouseUp(MouseEvent e) {} 
-			public void mouseDoubleClick(MouseEvent e) {} 
-		});
-
-		canvas.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent e) {
-				InputPacket packet = new InputPacket(0);
-				switch (e.character) {
-				case 'w':
-					packet.y = -1;
-					break;
-				case 's':
-					packet.y = 1;
-					break;
-				case 'a':
-					packet.x = -1;
-					break;
-				case 'd':
-					packet.x = 1;
-					break;
-				}
-				//System.out.println("key " + e.character);
-				// update tank location
-				//x += directionX;
-				//y += directionY;
-				try {
-					out.writeObject(packet);
-				}
-				catch(IOException ex) {
-					System.out.println("The server did not respond (write KL).");
-				}
-
-				canvas.redraw();
+			gridDatas[i].verticalAlignment = GridData.FILL;
+			gridDatas[i].grabExcessVerticalSpace = true;
+						
+			if (i > 0) {
+				screens[i].getComposite().setVisible(false);
+				gridDatas[i].exclude = true;
 			}
-			public void keyReleased(KeyEvent e) {}
-		});
-
-		System.out.println("3");
-		
-		try {
-			InputPacket test = new InputPacket(0);
-			out.writeObject(test);
+			
+			screens[i].getComposite().setLayoutData(gridDatas[i]);
 		}
-		catch(IOException ex) {
-			System.out.println("The server did not respond (initial write).");
-		}	
-		
-		System.out.println("4");
-		
-		
-		pool = Executors.newFixedThreadPool(1);
-		pool.execute(runnable);
-		//display.asyncExec(runnable);
+		//shell.pack();
 		shell.open();
-		while (!shell.isDisposed()) 
+		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
 				display.sleep();
-
+		}
 		display.dispose();
 		
-		System.out.println("5");
 	}
 	
-	public void addTank(Tank tank) {
-		tanks.add(tank);
+	public void setClientMVC(ClientModel model, ClientController control) {
+		clientModel = model;
+		clientControl = control;
 	}
 	
-	class Runner implements Runnable
-	{
-		private boolean terminate;
-		
-		public void stop() {
-			terminate = true;
-		}
-		
-		public void run() 
-		{
-			terminate = false;
-			while (!terminate) {
-				try {
-					if (in.available() > 0 || true)
-					{
-						// read in only other tanks and shots
-						InputPacket packet = null;
-						try {
-							packet = (InputPacket)in.readObject();
-						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						// used if new tank added after this local tank was added
-						if (packet.id >= tanks.size()) {
-							tanks.add(new Tank(packet.x, packet.y, packet.id));
-						}
-						tank.set(packet.x, packet.y, 0);
-						//canvas.redraw();
-					}
-				}
-				catch(IOException ex) {
-					System.out.println("The server did not respond (async).");
-				}				
-		        //display.timerExec(150, this);
+	public void setHostMVC(HostModel model, HostController control) {
+		hostModel = model;
+		hostControl = control;
+	}
+	
+	public void updateScreen(Mode mode) {		
+		for (int i = 0; i < screens.length; i++) {
+			if (i == mode.ordinal()) {
+				screens[i].getComposite().setVisible(true);
+				gridDatas[i].exclude = false;
+				screens[i].getComposite().setLayoutData(gridDatas[i]);
+			}
+			else {
+				screens[i].getComposite().setVisible(false);
+				gridDatas[i].exclude = true;
+				screens[i].getComposite().setLayoutData(gridDatas[i]);
 			}
 		}
-	};
+		shell.layout(true, true);
+	}
 }

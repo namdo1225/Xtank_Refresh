@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class HostModel {	
-	private XTankUI2			hostView;
+	private XTankUI			hostView;
 	private Mode				mode;
 	
 	private Server				server;
@@ -15,7 +15,7 @@ public class HostModel {
 		mode = Mode.MAIN;
 	}
 	
-	public void setMVC(XTankUI2 view) {
+	public void setMVC(XTankUI view) {
 		hostView = view;
 	}
 	

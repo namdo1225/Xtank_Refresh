@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ClientModel {	
-	private XTankUI2			clientView;
+	private XTankUI				clientView;
 	private Mode				mode;
 	private	Socket				socket;
 	private ObjectInputStream 	in;
@@ -28,7 +28,7 @@ public class ClientModel {
 		tank = new Tank(0, 0, 0);
 	}
 	
-	public void setMVC(XTankUI2 view) {
+	public void setMVC(XTankUI view) {
 		clientView = view;
 	}
 	
