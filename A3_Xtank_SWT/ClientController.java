@@ -3,10 +3,6 @@ import java.io.IOException;
 public class ClientController {
 	private ClientModel				clientModel;
 	
-	public ClientController() {
-		
-	}
-	
 	public void setMVC(ClientModel model) {
 		clientModel = model;
 	}
@@ -40,5 +36,12 @@ public class ClientController {
 	public void stopRunnable() {
 		if (clientModel.getRun() != null)
 			clientModel.getRun().stop();
+	}
+	
+	public void writeOut(InputPacket packet) {
+		try { clientModel.getOutput().writeObject(packet); }
+		catch (IOException e) {
+			System.out.println("The server did not respond (write KL).");
+		}
 	}
 }

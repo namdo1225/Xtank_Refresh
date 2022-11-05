@@ -42,9 +42,11 @@ public class JoinScreen extends Screen {
 		
 		title = new Label(composite, SWT.BALLOON);
 		title.setText("Set your IP address and port number and click 'Next'. \n'UAWiFi' "
-				+ "does not work consistently for us."
-				+ "\nLocalhost: 127.0.0.1\tYour (probably wrong) IP: " + address);
-		title.setFont(new Font(display,"Times New Roman", 14, SWT.BOLD ));
+				+ "does not work consistently for us. Your inputs are validated."
+				+ "You will crash the program if the numbers entered are out of int's bounds.\n"
+				+ "Well-known port range: 1024-65,535\tLocalhost: 127.0.0.1\tYour (probably wrong) IP: "
+				+ address);
+		title.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));
 		title.setAlignment(SWT.CENTER);
 		
 		iP = new Text(composite, SWT.LEFT | SWT.BORDER);
@@ -76,6 +78,13 @@ public class JoinScreen extends Screen {
 				cControl.createSocket(iP.getText(), Integer.parseInt(port.getText()));
 				cControl.updateScreen(Mode.GAME);
 			} catch (Exception e) {}
+		else {
+			iP.setMessage("Enter IPv4 address: One of your input was invalid.");
+			iP.setText("");
+			
+			port.setMessage("Enter port number: One of your input was invalid.");
+			port.setText("");
+		}
 	}
 	
 	private boolean validateInput() {

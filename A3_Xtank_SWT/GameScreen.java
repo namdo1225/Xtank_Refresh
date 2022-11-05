@@ -102,13 +102,8 @@ public class GameScreen extends Screen {
 				// update tank location
 				//x += directionX;
 				//y += directionY;
-				try {
-					cModel.getOutput().writeObject(packet);
-				}
-				catch(IOException ex) {
-					System.out.println("The server did not respond (write KL).");
-				}
-
+				
+				cControl.writeOut(packet);
 				canvas.redraw();
 			}
 			public void keyReleased(KeyEvent e) {}
