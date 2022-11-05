@@ -87,15 +87,7 @@ public class XTankUI
 
 		canvas.addMouseListener(new MouseListener() {
 			public void mouseDown(MouseEvent e) {
-				//System.out.println("mouseDown in canvas");
-				try {
-					System.out.println(in.available());
-					InputPacket packet = (InputPacket)in.readObject();
-					System.out.println(packet.y == 1);
-				} catch (ClassNotFoundException | IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				System.out.println("mouseDown in canvas");
 			} 
 			public void mouseUp(MouseEvent e) {} 
 			public void mouseDoubleClick(MouseEvent e) {} 
