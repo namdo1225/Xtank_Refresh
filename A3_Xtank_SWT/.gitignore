@@ -5,20 +5,26 @@
 /XTankUI$2.class
 /XTankUI$Runner.class
 /XTankUI.class
-<<<<<<< HEAD
 /Game.class
 /Client.class
 /InputPacket.class
 /XTankUI$3.class
 /Server$XTankManager.class
 /Server.class
-=======
 /JoinMenu.class
 /JoinScreen.class
 /GameScreen.class
 /HostScreen.class
 /MenuScreen.class
 /Screen.class
->>>>>>> refs/remotes/origin/main
 /Tank.class
 /IntPacket.class
+/ClientController.class
+/ClientModel.class
+/HostController.class
+/HostModel.class
+/Mode.class
+/XTank2.class
+/XTankServer2$XTankManager.class
+/XTankServer2.class
+/XTankUI2.class
