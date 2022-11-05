@@ -193,5 +193,5 @@ public class XTankUI
 		        //display.timerExec(150, this);
 			}
 		}
-	};	
+	};
 }

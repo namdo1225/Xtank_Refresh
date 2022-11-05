@@ -8,9 +8,8 @@ import java.net.UnknownHostException;
 public class HostModel {	
 	private XTankUI2			hostView;
 	private Mode				mode;
-	private	ServerSocket		socket;
-	private DataInputStream 	in;
-	private DataOutputStream 	out;
+	
+	private Server				server;
 	
 	public HostModel() {
 		mode = Mode.MAIN;
@@ -26,9 +25,6 @@ public class HostModel {
 	}
 	
 	public void setServerSocket(int port) {
-        try
-        {
-        	socket = new ServerSocket(port);
-        } catch (Exception e) {}
+        server = new Server(port);
 	}
 }

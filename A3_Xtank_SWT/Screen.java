@@ -6,14 +6,20 @@ import org.eclipse.swt.widgets.Shell;
 public abstract class Screen {
 	protected Composite			composite;
 	
+	protected ClientModel		cModel;
 	protected ClientController 	cControl;
 	
+	protected HostModel			hModel;
 	protected HostController	hControl;
 	
-	public Screen(Shell shell, Display display, ClientController cCon, HostController hCon) {
+	public Screen(Shell shell, Display display, ClientController cCon, HostController hCon,
+			ClientModel cMod, HostModel hMod) {
 		composite = makeComposite(shell, display);
 		cControl = cCon;
 		hControl = hCon;
+		
+		cModel = cMod;
+		hModel = hMod;
 	}
 	
 	protected abstract Composite makeComposite(Shell shell, Display display);

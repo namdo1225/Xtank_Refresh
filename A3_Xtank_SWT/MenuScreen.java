@@ -15,8 +15,9 @@ public class MenuScreen extends Screen {
 	private Button		mainHost;
 	private Button		mainExit;
 
-	public MenuScreen(Shell shell, Display display, ClientController cCon, HostController hCon) {
-		super(shell, display, cCon, hCon);
+	public MenuScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
+			ClientModel cMod, HostModel hMod) {
+		super(shell, display, cCon, hCon, cMod, hMod);
 	}
 
 	protected Composite makeComposite(Shell shell, Display display) {
@@ -35,7 +36,7 @@ public class MenuScreen extends Screen {
 		mainHost = new Button(composite, SWT.PUSH);
 		mainHost.setText("Host Game");
 		mainHost.addSelectionListener(
-				SelectionListener.widgetSelectedAdapter(e-> makeServer()));
+				SelectionListener.widgetSelectedAdapter(e-> hControl.updateScreen(Mode.HOST)));
 		
 		mainExit = new Button(composite, SWT.PUSH);
 		mainExit.setText("Exit Game");
@@ -45,10 +46,5 @@ public class MenuScreen extends Screen {
 		composite.setLayout(new FillLayout(SWT.VERTICAL));
 		
 		return composite;
-	}
-	
-	private void makeServer() {
-		hControl.updateScreen(Mode.HOST);
-		hControl.createServerSocket(8080);
 	}
 }

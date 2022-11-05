@@ -27,8 +27,9 @@ public class JoinScreen extends Screen {
 	private Button		next;
 	private Button		back;
 	
-	public JoinScreen(Shell shell, Display display, ClientController cCon, HostController hCon) {
-		super(shell, display, cCon, hCon);
+	public JoinScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
+			ClientModel cMod, HostModel hMod) {
+		super(shell, display, cCon, hCon, cMod, hMod);
 	}
 	
 	protected Composite makeComposite(Shell shell, Display display) {
@@ -48,9 +49,11 @@ public class JoinScreen extends Screen {
 		
 		iP = new Text(composite, SWT.LEFT | SWT.BORDER);
 		iP.setMessage("Enter IPv4 address:");
+		iP.setText("127.0.0.1");
 		
 		port = new Text(composite, SWT.LEFT | SWT.BORDER);
 		port.setMessage("Enter port number:");
+		port.setText("8080");
 		
 		next = new Button(composite, SWT.PUSH);
 		next.setText("Next");
@@ -71,6 +74,7 @@ public class JoinScreen extends Screen {
 		if (validateInput())
 			try {
 				cControl.createSocket(iP.getText(), Integer.parseInt(port.getText()));
+				cControl.updateScreen(Mode.GAME);
 			} catch (Exception e) {}
 	}
 	

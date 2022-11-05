@@ -1,4 +1,6 @@
 
+import java.io.IOException;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
@@ -19,10 +21,6 @@ public class XTankUI2
 	
 	private	Screen[]				screens;
 	private GridData[]				gridDatas;
-	private Screen					joinScreen;
-	private Screen					hostScreen;
-	private Screen					menuScreen;
-	private Screen					gameScreen;
 
 	private GridLayout				layout;
 	
@@ -42,13 +40,30 @@ public class XTankUI2
 		shell.setLayout(layout);
 		shell.setBackground(null);
 		
+		shell.addListener(SWT.Close, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				try {
+					clientControl.closeInput();
+					clientControl.closeOutput();
+					clientControl.stopRunnable();
+						
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				shell.dispose();
+				display.dispose();
+			}
+		});
+		
 		screens = new Screen[4];
 		gridDatas = new GridData[4];
 		
-		screens[0] = new MenuScreen(shell, display, clientControl, hostControl);
-		screens[1] = new JoinScreen(shell, display, clientControl, hostControl);
-		screens[2] = new HostScreen(shell, display, clientControl, hostControl);
-		screens[3] = new GameScreen(shell, display, clientControl, hostControl);
+		screens[0] = new MenuScreen(shell, display, clientControl, hostControl, clientModel, hostModel);
+		screens[1] = new JoinScreen(shell, display, clientControl, hostControl, clientModel, hostModel);
+		screens[2] = new HostScreen(shell, display, clientControl, hostControl, clientModel, hostModel);
+		screens[3] = new GameScreen(shell, display, clientControl, hostControl, clientModel, hostModel);
 		
 		for (int i = 0; i < gridDatas.length; i++) {
 			gridDatas[i] = new GridData();
