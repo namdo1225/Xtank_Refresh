@@ -10,6 +10,8 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -63,10 +65,15 @@ public class GameScreen extends Screen {
 		
 		canvas.addPaintListener(event -> {
 			Tank tank = cModel.getTank();
-			
+			Rectangle tank_body = new Rectangle(tank.getX(), tank.getY(), 50, 100);
+			Transform transform = new Transform(display);
+			transform.translate(tank.getX() + 25, tank.getY() + 50);
+			transform.rotate(-(float)tank.getRotate() + 90.0f);
+			transform.translate(-tank.getX() - 25, -tank.getY() - 50);
+			event.gc.setTransform(transform);
 			event.gc.fillRectangle(canvas.getBounds());
 			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-			event.gc.fillRectangle(tank.getX(), tank.getY(), 50, 100);
+			event.gc.fillRectangle(tank_body);
 			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 			event.gc.fillOval(tank.getX(), tank.getY()+25, 50, 50);
 			event.gc.setLineWidth(4);

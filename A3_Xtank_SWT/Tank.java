@@ -18,6 +18,12 @@ public class Tank {
 		this.y += y;
 	}
 	
+	public void moveForward(int speed) {
+		System.out.println(getDirectionX() + " " + getDirectionY());
+		this.x += getDirectionX() * speed;
+		this.y -= getDirectionY() * speed;
+	}
+	
 	public void set(int x, int y, int rotate) {
 		this.x = x;
 		this.y = y;
@@ -25,7 +31,21 @@ public class Tank {
 	}
 	
 	public void rotate(int rotate) {
-		this.rotate = rotate;
+		this.rotate += rotate;
+		if (this.rotate >= 360) {
+			this.rotate %= 360;
+		}
+		if (this.rotate < 0) {
+			this.rotate += 360;
+		}
+	}
+	
+	public double getDirectionX() {
+		return Math.cos(Math.toRadians(rotate));
+	}
+	
+	public double getDirectionY() {
+		return Math.sin(Math.toRadians(rotate));
 	}
 	
 	public int getX() {

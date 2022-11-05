@@ -21,23 +21,6 @@ public class Server
 
 	private static ServerSocket						listener;
 	private static ExecutorService					pool;
-	
-    public static void main(String[] args) throws Exception 
-    {
-		//System.out.println(InetAddress.getLocalHost());
-		sq = new ArrayList<>();
-		tanks = new ArrayList<>();
-        try
-        {
-        	listener = new ServerSocket(12346);
-            //System.out.println("The XTank server is running...");
-            pool = Executors.newFixedThreadPool(19);
-            while (true) 
-            {
-                pool.execute(new XTankManager(listener.accept()));
-            }
-        } catch (Exception e) {}
-    }
 
     public Server(int port) {
 		//System.out.println(InetAddress.getLocalHost());
@@ -74,7 +57,8 @@ public class Server
             	out.flush();
             	int initial_x = 0;
             	int initial_y = 0;
-            	out.writeObject(new InputPacket(tanks.size(), initial_x, initial_y, 0));
+            	int initial_angle = 0;
+            	out.writeObject(new InputPacket(tanks.size(), initial_x, initial_y, initial_angle, false));
             	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             	System.out.println("cat");
             	
@@ -86,13 +70,15 @@ public class Server
                 	InputPacket input = (InputPacket)in.readObject();
                 	// update tank position server side
                 	final int SPEED = 5;
-                	tanks.get(input.id).move(input.x * SPEED, input.y * SPEED);
-                	System.out.println(input.y == 1);
+                	tanks.get(input.id).rotate(-input.x * SPEED);
+                	System.out.println(tanks.get(input.id).getRotate());
+                	tanks.get(input.id).moveForward(-input.y * SPEED);
                 	for (ObjectOutputStream o: sq)
                 	{
                     	System.out.println("o = " + o);
                     	InputPacket to_client = new InputPacket(input.id, 
-                    			tanks.get(input.id).getX(), tanks.get(input.id).getY(), 0);
+                    			tanks.get(input.id).getX(), tanks.get(input.id).getY(),
+                    			tanks.get(input.id).getRotate(), false);
                     	
     					o.writeObject(to_client);
     					o.flush();

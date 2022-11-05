@@ -21,7 +21,6 @@ public class ClientModel {
 	private Runner				runnable;
 	private ExecutorService		pool;
 	
-	
 	public ClientModel() {
 		mode = Mode.MAIN;
 		tanks = new ArrayList<>();
@@ -38,22 +37,27 @@ public class ClientModel {
 	}
 	
 	public void setSocket(String ip, int port) {
+		System.out.println("here");
         try
         {
         	socket = new Socket(ip, port);
         	
         	in = new ObjectInputStream(socket.getInputStream());
+        	System.out.println(in);
         	out = new ObjectOutputStream(socket.getOutputStream());
         	out.flush();
         	try {
         		new_tank = (InputPacket)in.readObject();
+        		System.out.println(new_tank.id);
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         	tank = new Tank(new_tank.x, new_tank.y, new_tank.id);
         	
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        	System.out.println("error");
+        }
         
         runnable = new Runner();
 		pool = Executors.newFixedThreadPool(1);
@@ -103,7 +107,7 @@ public class ClientModel {
 						if (packet.id >= tanks.size()) {
 							tanks.add(new Tank(packet.x, packet.y, packet.id));
 						}
-						tank.set(packet.x, packet.y, 0);
+						tank.set(packet.x, packet.y, packet.angle);
 						//canvas.redraw();
 					}
 				}
