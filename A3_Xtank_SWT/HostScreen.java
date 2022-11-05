@@ -37,7 +37,7 @@ public class HostScreen extends Screen {
 		} catch (UnknownHostException e1) {}
 		
 		guide = new Label(composite, SWT.BALLOON);
-		guide.setText("Click 'Update' to create new server connection with the port number"
+		guide.setText("Click 'Update' to create new server connection with the port number "
 				+ "defined in the text field. You cannot click 'Next' to start the game "
 				+ "unless 2 or more players are in. Your input is validated. You will "
 				+ "crash the program if your number is out of int's bounds."
