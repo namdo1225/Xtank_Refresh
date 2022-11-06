@@ -37,11 +37,9 @@ public class ClientModel {
 	}
 	
 	public void setSocket(String ip, int port) {
-		System.out.println("here");
-        try
-        {
+        try {
         	socket = new Socket(ip, port);
-        	
+        	        	
         	in = new ObjectInputStream(socket.getInputStream());
         	System.out.println(in);
         	out = new ObjectOutputStream(socket.getOutputStream());
@@ -55,15 +53,18 @@ public class ClientModel {
 			}
         	tank = new Tank(new_tank.x, new_tank.y, new_tank.id);
         	
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
         	System.out.println("error");
         }
         
-        runnable = new Runner();
-		pool = Executors.newFixedThreadPool(1);
-		pool.execute(runnable);
+        if (socket.isConnected()) {        	
+        	runnable = new Runner();
+        	pool = Executors.newFixedThreadPool(1);
+			pool.execute(runnable);
+        }
 	}
-	
+		
 	public Tank getTank() {
 		return tank;
 	}
@@ -92,6 +93,7 @@ public class ClientModel {
 			terminate = true;
 		}
 		
+		@Override
 		public void run() 
 		{
 			terminate = false;
@@ -117,7 +119,8 @@ public class ClientModel {
 				}
 				catch(IOException ex) {
 					System.out.println("The server did not respond (async).");
-				}				
+					stop();
+				}
 		        //display.timerExec(150, this);
 			}
 		}

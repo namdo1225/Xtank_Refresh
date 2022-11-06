@@ -43,9 +43,11 @@ public class Server
     
     protected static class XTankManager implements Runnable {
         private Socket					socket;
+        private static XTankConnection	connector;
         
-        public XTankManager(Socket soc) {
+        public XTankManager(Socket soc, XTankConnection connection) {
         	socket = soc;
+        	connector = connection;
         }
 
         @Override
@@ -95,6 +97,7 @@ public class Server
             {
             	sq.remove(out);
             	tanks.remove(tanks.size() - 1);
+            	connector.setPlCount(connector.getPlCount() - 1);
                 try { socket.close(); } 
                 catch (IOException e) {}
                 System.out.println("Closed: " + socket);
@@ -123,7 +126,7 @@ public class Server
             		clients++;
 
             		ExecutorService poolTest = Executors.newFixedThreadPool(5);
-            		poolTest.execute(new XTankManager(socket));
+            		poolTest.execute(new XTankManager(socket, this));
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -133,6 +136,10 @@ public class Server
 
         public static int getPlCount() {
         	return clients;
+        }
+        
+        public static void setPlCount(int players) {
+        	clients = players;
         }
     }
 }

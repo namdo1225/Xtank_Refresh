@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class JoinScreen extends Screen {
 	private Label		title;
+	private Label		error;
 	
 	private Text		iP;
 	private Text		port;
@@ -49,6 +50,11 @@ public class JoinScreen extends Screen {
 		title.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));
 		title.setAlignment(SWT.CENTER);
 		
+		error = new Label(composite, SWT.BALLOON);
+		error.setFont(new Font(display, "Times New Roman", 12, SWT.BOLD ));
+		error.setAlignment(SWT.CENTER);
+		error.setForeground(display.getSystemColor(SWT.COLOR_RED));
+		
 		iP = new Text(composite, SWT.LEFT | SWT.BORDER);
 		iP.setMessage("Enter IPv4 address:");
 		iP.setText("127.0.0.1");
@@ -76,7 +82,11 @@ public class JoinScreen extends Screen {
 		if (validateInput())
 			try {
 				cControl.createSocket(iP.getText(), Integer.parseInt(port.getText()));
-				cControl.updateScreen(Mode.GAME);
+				
+				if (cModel.getSocket() != null && cModel.getSocket().isConnected())
+					cControl.updateScreen(Mode.GAME);
+				else
+					error.setText("The server did not respond.");
 			} catch (Exception e) {}
 		else {
 			iP.setMessage("Enter IPv4 address: One of your input was invalid.");
@@ -84,6 +94,7 @@ public class JoinScreen extends Screen {
 			
 			port.setMessage("Enter port number: One of your input was invalid.");
 			port.setText("");
+			error.setText("");
 		}
 	}
 	

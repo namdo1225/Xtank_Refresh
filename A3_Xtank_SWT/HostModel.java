@@ -29,6 +29,8 @@ public class HostModel {
 	}
 	
 	public int getPlayer() {
+		if (server == null)
+			return 0;
 		return server.getPlCount();
 	}
 }
