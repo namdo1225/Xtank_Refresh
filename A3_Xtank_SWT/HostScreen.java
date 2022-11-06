@@ -40,7 +40,7 @@ public class HostScreen extends Screen {
 		guide.setText("Click 'Update' to create new server connection with the port number "
 				+ "defined in the text field. You cannot click 'Next' to start the game "
 				+ "unless 2 or more players are in. Your input is validated. You will "
-				+ "crash the program if your number is out of int's bounds."
+				+ "crash the program if your number is out of int's bounds. You cannot host AND play the game."
 				+ "\nWell-known port range: 1024-65,535\tLocalhost: 127.0.0.1\tYour (probably wrong) IP: "
 				+ address);
 		guide.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));

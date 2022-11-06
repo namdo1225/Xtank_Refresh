@@ -17,6 +17,29 @@ public class ClientController {
 		} catch (Exception e) {}
 	}
 	
+	public void endGame() {
+		try {
+			if (clientModel.getInput() != null)
+				clientModel.getInput().close();
+		}
+		catch (IOException e) {}
+		
+		try {
+			if (clientModel.getOutput() != null)
+				clientModel.getOutput().close();
+		}
+		catch (IOException e) {}
+		
+		if (clientModel.getRun() != null)
+			clientModel.getRun().stop();
+		
+		try {
+			clientModel.getSocket().close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void closeInput() {
 		try {
 			if (clientModel.getInput() != null)

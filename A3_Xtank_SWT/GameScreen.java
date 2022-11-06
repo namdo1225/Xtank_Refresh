@@ -53,7 +53,7 @@ public class GameScreen extends Screen {
 		
 		quit = new Button(compositePlayer, SWT.PUSH);
 		quit.setText("Quit");
-		quit.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> System.out.println("Pressed")));
+		quit.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> endGame()));
 		
 		compositeGame = new Composite(composite, SWT.COLOR_BLACK);
 		compositeGame.setLayout(new FillLayout(SWT.VERTICAL));
@@ -141,4 +141,8 @@ public class GameScreen extends Screen {
 		return composite;
 	}
 	
+	public void endGame() {
+		cControl.endGame();
+		cControl.updateScreen(Mode.MAIN);
+	}
 }

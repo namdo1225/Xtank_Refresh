@@ -80,6 +80,10 @@ public class ClientModel {
 		return runnable;
 	}
 	
+	public Socket getSocket() {
+		return socket;
+	}
+	
 	public class Runner implements Runnable
 	{
 		private boolean terminate;
