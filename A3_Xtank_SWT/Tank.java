@@ -5,6 +5,8 @@ public class Tank {
 	private float y;
 	private int rotate;
 	private int id;
+	public static final int width = 25;
+	public static final int height = 50;
 	
 	public Tank(int x, int y, int id) {
 		this.x = x;

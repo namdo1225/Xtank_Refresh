@@ -16,6 +16,7 @@ public class GameMap {
 	private int[] w;
 	private int[] h;
 	
+	// Client
 	public GameMap(Display display, Composite composite) {
 		obstacles = new ArrayList<Canvas>();
 		
@@ -27,6 +28,11 @@ public class GameMap {
 		
 		setMap2();
 		makeObstacle();
+	}
+	
+	// Server
+	public GameMap() {
+		setMap2();
 	}
 	
 	private void setMap1() {
@@ -64,7 +70,7 @@ public class GameMap {
 				y1 < y[i] + h[i] &&
 				y2 > y[i])
 			{
-				System.out.println("collision " + x1 + " " + y1);
+				//System.out.println("collision " + x1 + " " + y1);
 				return true;
 			}
 		}

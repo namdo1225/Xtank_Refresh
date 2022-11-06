@@ -23,13 +23,14 @@ public class Server
 
 	private static ServerSocket						listener;
 	private static ExecutorService					pool;
-
+	private static GameMap							map;
 	
     public Server(int port) {
 		//System.out.println(InetAddress.getLocalHost());
     	
 		sq = new ArrayList<>();
 		tanks = new HashMap<Integer, Tank>();
+		map = new GameMap();
         try
         {
         	listener = new ServerSocket(port);
@@ -70,8 +71,8 @@ public class Server
             {
             	out = new ObjectOutputStream(socket.getOutputStream());
             	out.flush();
-            	int initial_x = 0;
-            	int initial_y = 0;
+            	int initial_x = 50;
+            	int initial_y = 50;
             	int initial_angle = 0;
             	out.writeObject(new InputPacket(tanks.size(), initial_x, initial_y, initial_angle, false));
             	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
@@ -92,6 +93,13 @@ public class Server
                 	tanks.get(input.id).rotate(-input.x * SPEED);
                 	System.out.println(tanks.get(input.id).getRotate());
                 	tanks.get(input.id).moveForward(-input.y * SPEED);
+                	if (map.collision(tanks.get(input.id).getX(),
+            			tanks.get(input.id).getY(),
+            			tanks.get(input.id).getX() + (Tank.width),
+            			tanks.get(input.id).getY() + (Tank.height)))
+        			{
+                		tanks.get(input.id).moveForward(input.y * SPEED);
+        			}
                 	for (ObjectOutputStream o: sq)
                 	{
                     	System.out.println("o = " + o);

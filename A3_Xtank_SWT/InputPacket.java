@@ -16,6 +16,7 @@ public class InputPacket implements java.io.Serializable {
 	public int y;
 	public int angle;
 	public boolean shoot;
+	public boolean add_player;
 }
 
 class IntPacket {
