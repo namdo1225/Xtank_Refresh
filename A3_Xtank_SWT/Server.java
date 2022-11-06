@@ -31,24 +31,28 @@ public class Server
         	listener = new ServerSocket(port);
             //System.out.println("The XTank server is running...");
             pool = Executors.newFixedThreadPool(19);
-            while (true) 
-            {
-                pool.execute(new XTankManager(listener.accept()));
-            	System.out.println("WTF2");
-
-            }
+            pool.execute(new XTankManager(listener));
         } catch (Exception e) {}
     }
     
     private static class XTankManager implements Runnable 
     {
-        private Socket socket;
+        private Socket			socket;
+        private ServerSocket	listener;
 
-        XTankManager(Socket socket) { this.socket = socket; }
+        XTankManager(ServerSocket listener) { this.listener = listener; }
 
         @Override
         public void run() 
         {
+        	try {
+        		socket = listener.accept();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	
+        	
             System.out.println("Connected: " + socket);
             ObjectOutputStream out = null;
             try 
