@@ -21,6 +21,7 @@ public class HostScreen extends Screen {
 	private Button		update;
 	private Button		next;
 	private Button		back;
+	private Button		updatePlayer;
 	
 	public HostScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
@@ -49,6 +50,11 @@ public class HostScreen extends Screen {
 		numPlayers = new Label(composite, SWT.BALLOON);
 		numPlayers.setFont(new Font(display,"Times New Roman", 14, SWT.BOLD ));
 		numPlayers.setText("Number of players:\t0");
+		
+		updatePlayer = new Button(composite, SWT.PUSH);
+		updatePlayer.setText("Update # of players");
+		updatePlayer.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> updatePlCount()));
 		
 		port = new Text(composite, SWT.LEFT | SWT.BORDER);
 		port.setMessage("Enter port number:");
@@ -92,5 +98,9 @@ public class HostScreen extends Screen {
 		if (portNum < 0 || portNum > 65535)
 			return false;
 		return true;
+	}
+
+	private void updatePlCount() {
+		numPlayers.setText("Number of players:\t" + hModel.getPlayer());
 	}
 }

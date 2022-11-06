@@ -22,37 +22,35 @@ public class Server
 	private static ServerSocket						listener;
 	private static ExecutorService					pool;
 
+	
     public Server(int port) {
 		//System.out.println(InetAddress.getLocalHost());
+    	
 		sq = new ArrayList<>();
 		tanks = new ArrayList<>();
         try
         {
         	listener = new ServerSocket(port);
             //System.out.println("The XTank server is running...");
-            pool = Executors.newFixedThreadPool(19);
-            pool.execute(new XTankManager(listener));
+            pool = Executors.newFixedThreadPool(5);
+            pool.execute(new XTankConnection(listener));
         } catch (Exception e) {}
     }
     
-    private static class XTankManager implements Runnable 
-    {
-        private Socket			socket;
-        private ServerSocket	listener;
-
-        XTankManager(ServerSocket listener) { this.listener = listener; }
+    public int getPlCount() {
+    	return XTankConnection.getPlCount();
+    }
+    
+    protected static class XTankManager implements Runnable {
+        private Socket					socket;
+        
+        public XTankManager(Socket soc) {
+        	socket = soc;
+        }
 
         @Override
         public void run() 
         {
-        	try {
-        		socket = listener.accept();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-        	
-        	
             System.out.println("Connected: " + socket);
             ObjectOutputStream out = null;
             try 
@@ -104,6 +102,39 @@ public class Server
         }
     }
     
+    protected static class XTankConnection implements Runnable {
+        private Socket					socket;
+        private static ServerSocket		listener;
+        private static HostModel		hostModel;
+        private static int				clients;
+        
+        public XTankConnection(ServerSocket listener) {
+        	clients = 0;
+        	XTankConnection.listener = listener;
+        }
+
+        @Override
+        public void run() 
+        {
+        	while (true) {
+                try {
+                	
+                    socket = listener.accept();
+            		clients++;
+
+            		ExecutorService poolTest = Executors.newFixedThreadPool(5);
+            		poolTest.execute(new XTankManager(socket));
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+        	}
+        }
+
+        public static int getPlCount() {
+        	return clients;
+        }
+    }
 }
 
 

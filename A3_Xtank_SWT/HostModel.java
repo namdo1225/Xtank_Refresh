@@ -27,4 +27,8 @@ public class HostModel {
 	public void setServerSocket(int port) {
         server = new Server(port);
 	}
+	
+	public int getPlayer() {
+		return server.getPlCount();
+	}
 }
