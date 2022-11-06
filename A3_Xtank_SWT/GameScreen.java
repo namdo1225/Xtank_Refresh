@@ -84,6 +84,7 @@ public class GameScreen extends Screen {
 			event.gc.setLineWidth(4);
 			event.gc.drawLine(tank.getX()+25, tank.getY()+25, tank.getX()+25, tank.getY()-15);
 			//canvas.setBounds(tank.getX(), tank.getY(), 50, 100);
+			map.collision(tank.getX(), tank.getY(), tank.getX() + 50, tank.getY() + 100);
 		});	
 
 
