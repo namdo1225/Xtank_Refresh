@@ -33,6 +33,7 @@ public class GameScreen extends Screen {
 	
 	private GridLayout		layout;
 	
+	private GameMap			map;
 	
 	public GameScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
@@ -56,12 +57,16 @@ public class GameScreen extends Screen {
 		quit.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> endGame()));
 		
 		compositeGame = new Composite(composite, SWT.COLOR_BLACK);
-		compositeGame.setLayout(new FillLayout(SWT.VERTICAL));
-		compositeGame.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+		//compositeGame.setLayout(new FillLayout(SWT.VERTICAL));
+		//compositeGame.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
+		compositeGame.setBackgroundMode(SWT.INHERIT_FORCE);
 		composite.setBackgroundMode(SWT.INHERIT_FORCE);
 
 		
-		canvas = new Canvas(compositeGame, SWT.COLOR_WHITE);
+		canvas = new Canvas(compositeGame, SWT.TRANSPARENT);
+		map = new GameMap(display, compositeGame);
+		
+		canvas.setBounds(0, 0, 800, 500);
 		
 		canvas.addPaintListener(event -> {
 			Tank tank = cModel.getTank();
@@ -71,15 +76,18 @@ public class GameScreen extends Screen {
 			transform.rotate(-(float)tank.getRotate() + 90.0f);
 			transform.translate(-tank.getX() - 25, -tank.getY() - 50);
 			event.gc.setTransform(transform);
-			event.gc.fillRectangle(canvas.getBounds());
+			//event.gc.fillRectangle(canvas.getBounds());
 			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
 			event.gc.fillRectangle(tank_body);
 			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_BLACK));
 			event.gc.fillOval(tank.getX(), tank.getY()+25, 50, 50);
 			event.gc.setLineWidth(4);
 			event.gc.drawLine(tank.getX()+25, tank.getY()+25, tank.getX()+25, tank.getY()-15);
+			//canvas.setBounds(tank.getX(), tank.getY(), 50, 100);
 		});	
 
+
+		
 		canvas.addMouseListener(new MouseListener() {
 			public void mouseDown(MouseEvent e) {
 				System.out.println("mouseDown in canvas");

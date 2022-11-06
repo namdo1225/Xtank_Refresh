@@ -63,6 +63,7 @@ public class XTankUI
 				}
 				shell.dispose();
 				display.dispose();
+				System.exit(0);
 			}
 		});
 		
