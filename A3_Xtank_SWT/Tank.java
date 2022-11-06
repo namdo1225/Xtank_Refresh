@@ -1,8 +1,8 @@
 
 public class Tank {
 
-	private int x;
-	private int y;
+	private float x;
+	private float y;
 	private int rotate;
 	private int id;
 	
@@ -20,8 +20,8 @@ public class Tank {
 	
 	public void moveForward(int speed) {
 		System.out.println(getDirectionX() + " " + getDirectionY());
-		this.x += getDirectionX() * speed;
-		this.y -= getDirectionY() * speed;
+		this.x += (float)getDirectionX() * (float)speed;
+		this.y -= (float)getDirectionY() * (float)speed;
 	}
 	
 	public void set(int x, int y, int rotate) {
@@ -49,11 +49,11 @@ public class Tank {
 	}
 	
 	public int getX() {
-		return x;
+		return (int) x;
 	}
 	
 	public int getY() {
-		return y;
+		return (int) y;
 	}
 	
 	public int getRotate() {

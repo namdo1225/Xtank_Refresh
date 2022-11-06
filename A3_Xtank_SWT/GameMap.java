@@ -59,9 +59,14 @@ public class GameMap {
 	
 	public boolean collision(int x1, int y1, int x2, int y2) {
 		for (int i = 0; i < x.length; i++) {
-			if (!(x[i] > x2 || x[i] + w[i] < x1 || y[i] > y2 || y[i] + h[i] < y1))
-				System.out.println("collision");
+			if (x1 < x[i] + w[i] &&
+				x2 > x[i] &&
+				y1 < y[i] + h[i] &&
+				y2 > y[i])
+			{
+				System.out.println("collision " + x1 + " " + y1);
 				return true;
+			}
 		}
 		
 		return false;

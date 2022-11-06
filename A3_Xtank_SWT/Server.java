@@ -10,6 +10,8 @@ import java.net.InetAddress;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * When a client connects, a new thread is started to handle it.
@@ -17,7 +19,7 @@ import java.util.ArrayList;
 public class Server 
 {
 	private static ArrayList<ObjectOutputStream> 	sq;
-	private static ArrayList<Tank>					tanks; // TODO: change to map
+	private static HashMap<Integer, Tank>					tanks; // TODO: change to map
 
 	private static ServerSocket						listener;
 	private static ExecutorService					pool;
@@ -27,7 +29,7 @@ public class Server
 		//System.out.println(InetAddress.getLocalHost());
     	
 		sq = new ArrayList<>();
-		tanks = new ArrayList<>();
+		tanks = new HashMap<Integer, Tank>();
         try
         {
         	listener = new ServerSocket(port);
@@ -39,6 +41,14 @@ public class Server
     
     public int getPlCount() {
     	return XTankConnection.getPlCount();
+    }
+    
+    public static int getNewID() {
+    	int i = 0;
+    	while (tanks.containsKey(i)) {
+    		i++;
+    	}
+    	return i;
     }
     
     protected static class XTankManager implements Runnable {
@@ -55,6 +65,7 @@ public class Server
         {
             System.out.println("Connected: " + socket);
             ObjectOutputStream out = null;
+            int new_id = -1;
             try 
             {
             	out = new ObjectOutputStream(socket.getOutputStream());
@@ -67,7 +78,11 @@ public class Server
             	System.out.println("cat");
             	
                 sq.add(out);
-                tanks.add(new Tank(initial_x, initial_y, tanks.size()));
+                new_id = getNewID();
+                // add new tank
+                tanks.put(new_id, new Tank(initial_x, initial_y, new_id));
+                // send old tanks to new tank
+                
                 
                 while (true)
                 {
@@ -96,7 +111,8 @@ public class Server
             finally 
             {
             	sq.remove(out);
-            	tanks.remove(tanks.size() - 1);
+            	if (new_id > -1)
+            		tanks.remove(new_id);
             	connector.setPlCount(connector.getPlCount() - 1);
                 try { socket.close(); } 
                 catch (IOException e) {}
