@@ -17,7 +17,7 @@ public class GameMap {
 	private int[] h;
 	
 	// Client
-	public GameMap(Display display, Composite composite) {
+	public GameMap(Display display, Composite composite, int mapNum) {
 		obstacles = new ArrayList<Canvas>();
 		
 		canvas = new Canvas(composite, SWT.NONE);
@@ -26,13 +26,19 @@ public class GameMap {
 		
 		canvas.setLayout(null);
 		
-		setMap2();
+		if (mapNum == 2)
+			setMap2();
+		else
+			setMap1();
 		makeObstacle();
 	}
 	
 	// Server
-	public GameMap() {
-		setMap2();
+	public GameMap(int mapNum) {
+		if (mapNum == 2)
+			setMap2();
+		else
+			setMap1();
 	}
 	
 	private void setMap1() {

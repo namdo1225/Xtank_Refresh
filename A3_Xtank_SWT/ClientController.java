@@ -21,23 +21,20 @@ public class ClientController {
 		try {
 			if (clientModel.getInput() != null)
 				clientModel.getInput().close();
-		}
-		catch (IOException e) {}
-		
-		try {
+			
 			if (clientModel.getOutput() != null)
 				clientModel.getOutput().close();
+			
+			if (clientModel.getSocket() != null)
+				clientModel.getSocket().close();
+
 		}
 		catch (IOException e) {}
 		
 		if (clientModel.getRun() != null)
 			clientModel.getRun().stop();
 		
-		try {
-			clientModel.getSocket().close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		clientModel.deleteSocket();
 	}
 	
 	public void closeInput() {
@@ -66,5 +63,11 @@ public class ClientController {
 		catch (IOException e) {
 			System.out.println("The server did not respond (write KL).");
 		}
+	}
+	
+	public boolean isConnected() {
+		if (clientModel.getSocket() == null || clientModel.getTerminate())
+			return false;
+		return true;
 	}
 }

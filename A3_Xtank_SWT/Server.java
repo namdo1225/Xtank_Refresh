@@ -19,18 +19,21 @@ import java.util.Map;
 public class Server 
 {
 	private static ArrayList<ObjectOutputStream> 	sq;
-	private static HashMap<Integer, Tank>					tanks; // TODO: change to map
+	private static HashMap<Integer, Tank>			tanks;
 
 	private static ServerSocket						listener;
 	private static ExecutorService					pool;
 	private static GameMap							map;
 	
-    public Server(int port) {
+	private static boolean							acceptConnection;
+	
+    public Server(int port, int mapNum) {
 		//System.out.println(InetAddress.getLocalHost());
     	
+    	acceptConnection = true;
 		sq = new ArrayList<>();
 		tanks = new HashMap<Integer, Tank>();
-		map = new GameMap();
+		map = new GameMap(mapNum);
         try
         {
         	listener = new ServerSocket(port);
@@ -143,7 +146,7 @@ public class Server
         @Override
         public void run() 
         {
-        	while (true) {
+        	while (acceptConnection) {
                 try {
                 	
                     socket = listener.accept();
@@ -152,10 +155,16 @@ public class Server
             		ExecutorService poolTest = Executors.newFixedThreadPool(5);
             		poolTest.execute(new XTankManager(socket, this));
                 } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                	acceptConnection = false;
                 }
         	}
+        	
+        	if (!acceptConnection)
+        		if (socket != null)
+					try {
+						socket.close();
+					} catch (IOException e) {
+					}
         }
 
         public static int getPlCount() {
@@ -165,6 +174,18 @@ public class Server
         public static void setPlCount(int players) {
         	clients = players;
         }
+    }
+
+    public void closeServer() {
+    	acceptConnection = false;
+    	
+    	try {
+        	if (listener != null)
+        		listener.close();
+		} catch (IOException e) {}
+    	
+    	if (pool != null)
+    		pool.shutdownNow();
     }
 }
 

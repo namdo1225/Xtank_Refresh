@@ -21,6 +21,8 @@ public class ClientModel {
 	private Runner				runnable;
 	private ExecutorService		pool;
 	
+	private boolean				terminate;
+	
 	public ClientModel() {
 		mode = Mode.MAIN;
 		tanks = new ArrayList<>();
@@ -37,7 +39,9 @@ public class ClientModel {
 	}
 	
 	public void setSocket(String ip, int port) {
-        try {
+		terminate = false;
+		
+		try {
         	socket = new Socket(ip, port);
         	        	
         	in = new ObjectInputStream(socket.getInputStream());
@@ -62,7 +66,8 @@ public class ClientModel {
         	runnable = new Runner();
         	pool = Executors.newFixedThreadPool(1);
 			pool.execute(runnable);
-        }
+        } else
+    		terminate = false;
 	}
 		
 	public Tank getTank() {
@@ -85,22 +90,20 @@ public class ClientModel {
 		return socket;
 	}
 	
-	public class Runner implements Runnable
-	{
-		private boolean terminate;
-		
-		public void stop() {
-			terminate = true;
-		}
-		
+	public void deleteSocket() {
+		socket = null;
+	}
+	
+	public boolean getTerminate() {
+		return terminate;
+	}
+	
+	public class Runner implements Runnable {
 		@Override
-		public void run() 
-		{
-			terminate = false;
+		public void run() {
 			while (!terminate) {
 				try {
-					if (in.available() > 0 || true)
-					{
+					if (in.available() > 0 || true) {
 						// read in only other tanks and shots
 						InputPacket packet = null;
 						try {
@@ -118,11 +121,15 @@ public class ClientModel {
 					}
 				}
 				catch(IOException ex) {
-					System.out.println("The server did not respond (async).");
+					//System.out.println("The server did not respond (async).");
 					stop();
 				}
 		        //display.timerExec(150, this);
 			}
+		}
+		
+		public void stop() {
+			terminate = true;			
 		}
 	};
 }

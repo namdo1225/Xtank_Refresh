@@ -27,6 +27,7 @@ public class GameScreen extends Screen {
 	private Composite 		compositePlayer;
 	private Label			plHeader;
 	private Button			quit;
+	private Label			serverStatus;
 	
 	private Composite 		compositeGame;
 	private Canvas			canvas;
@@ -52,6 +53,13 @@ public class GameScreen extends Screen {
 		plHeader.setFont(new Font(display,"Times New Roman", 14, SWT.BOLD ));
 		plHeader.setAlignment(SWT.LEFT);
 		
+		serverStatus = new Label(compositePlayer, SWT.BALLOON);
+		serverStatus.setText("Server\nACTIVE");
+		serverStatus.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));
+		serverStatus.setAlignment(SWT.LEFT);
+		serverStatus.setForeground(display.getSystemColor(SWT.COLOR_GREEN));
+
+		
 		quit = new Button(compositePlayer, SWT.PUSH);
 		quit.setText("Quit");
 		quit.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> endGame()));
@@ -64,7 +72,7 @@ public class GameScreen extends Screen {
 
 		
 		canvas = new Canvas(compositeGame, SWT.TRANSPARENT);
-		map = new GameMap(display, compositeGame);
+		map = new GameMap(display, compositeGame, 2);
 		
 		canvas.setBounds(0, 0, 800, 500);
 		
@@ -121,6 +129,7 @@ public class GameScreen extends Screen {
 				
 				cControl.writeOut(packet);
 				canvas.redraw();
+				checkConnection();
 			}
 			public void keyReleased(KeyEvent e) {}
 		});
@@ -150,7 +159,18 @@ public class GameScreen extends Screen {
 		return composite;
 	}
 	
+	public void checkConnection() {
+		if (!cControl.isConnected()) {
+			serverStatus.setText("Server\nCLOSED\nPlease\nQuit.");
+			serverStatus.setForeground(compositePlayer.getDisplay().getSystemColor(SWT.COLOR_RED));
+			
+			cControl.endGame();
+		}
+	}
+	
 	public void endGame() {
+		serverStatus.setText("Server\nACTIVE");
+		serverStatus.setForeground(compositePlayer.getDisplay().getSystemColor(SWT.COLOR_GREEN));
 		cControl.endGame();
 		cControl.updateScreen(Mode.MAIN);
 	}

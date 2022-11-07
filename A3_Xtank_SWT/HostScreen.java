@@ -23,6 +23,12 @@ public class HostScreen extends Screen {
 	private Button		back;
 	private Button		updatePlayer;
 	
+	private Composite	compositeNetwork;
+	
+	
+	private Composite	compositeMap;
+	
+	
 	public HostScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
 		super(shell, display, cCon, hCon, cMod, hMod);
@@ -32,49 +38,58 @@ public class HostScreen extends Screen {
 	protected Composite makeComposite(Shell shell, Display display) {
 		composite = new Composite(shell, SWT.COLOR_WHITE);
 		
+		compositeNetwork = new Composite(composite, SWT.TRANSPARENT);
+		compositeMap = new Composite(composite, SWT.TRANSPARENT);
+		
+		compositeNetwork.setLayout(new FillLayout(SWT.VERTICAL));
+		compositeMap.setLayout(new FillLayout(SWT.VERTICAL));
+		
 		String address = "";
 		try {
 			address = InetAddress.getLocalHost().toString();
 		} catch (UnknownHostException e1) {}
 		
-		guide = new Label(composite, SWT.BALLOON);
-		guide.setText("Click 'Update' to create new server connection with the port number "
-				+ "defined in the text field. You cannot click 'Next' to start the game "
-				+ "unless 2 or more players are in. Your input is validated. You will "
-				+ "crash the program if your number is out of int's bounds. You cannot host AND play the game."
-				+ "\nWell-known port range: 1024-65,535\tLocalhost: 127.0.0.1\tYour (probably wrong) IP: "
-				+ address);
+		guide = new Label(compositeMap, SWT.BALLOON);
+		guide.setText("'Update' create new server socket with the typed-in port number."
+				+ "\nYou cannot click 'Next' to start the game "
+				+ "unless 2 or more players are in.\nYour input is validated. "
+				+ "Program will crash if your number is out of int's bounds.\nYou cannot host AND play the game."
+				+ "\nWell-known port range: 1024-65,535\tLocalhost: 127.0.0.1\nYour (probably wrong) IP: "
+				+ address
+				+ "\nPick a map:");
 		guide.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));
 		guide.setAlignment(SWT.CENTER);
 		
-		numPlayers = new Label(composite, SWT.BALLOON);
+		
+		
+		numPlayers = new Label(compositeNetwork, SWT.BALLOON);
 		numPlayers.setFont(new Font(display,"Times New Roman", 14, SWT.BOLD ));
 		numPlayers.setText("Number of players:\t0");
 		
-		updatePlayer = new Button(composite, SWT.PUSH);
+		updatePlayer = new Button(compositeNetwork, SWT.PUSH);
 		updatePlayer.setText("Update # of players");
 		updatePlayer.addSelectionListener(
 				SelectionListener.widgetSelectedAdapter(e-> updatePlCount()));
 		
-		port = new Text(composite, SWT.LEFT | SWT.BORDER);
+		port = new Text(compositeNetwork, SWT.LEFT | SWT.BORDER);
 		port.setMessage("Enter port number:");
 		port.setText("8080");
 		
-		update = new Button(composite, SWT.PUSH);
+		update = new Button(compositeNetwork, SWT.PUSH);
 		update.setText("Update");
 		update.addSelectionListener(
 				SelectionListener.widgetSelectedAdapter(e-> hostServer()));
 		
-		next = new Button(composite, SWT.PUSH);
+		next = new Button(compositeNetwork, SWT.PUSH);
 		next.setText("Next");
 		next.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> validateInput()));
 		
-		back = new Button(composite, SWT.PUSH);
+		back = new Button(compositeNetwork, SWT.PUSH);
 		back.setText("Back");
 		back.addSelectionListener(
-				SelectionListener.widgetSelectedAdapter(e-> hControl.updateScreen(Mode.MAIN)));
+				SelectionListener.widgetSelectedAdapter(e-> closeServer()));
 		
-		composite.setLayout(new FillLayout(SWT.VERTICAL));
+		composite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		return composite;
 	}
@@ -82,7 +97,7 @@ public class HostScreen extends Screen {
 	private void hostServer() {
 		if (validateInput())
 			try {
-				hControl.createServerSocket(Integer.parseInt(port.getText()));
+				hControl.createServer(Integer.parseInt(port.getText()), 2);
 			} catch (Exception e) {}
 		else {
 			port.setMessage("Enter port number: Your input was invalid.");
@@ -102,5 +117,10 @@ public class HostScreen extends Screen {
 
 	private void updatePlCount() {
 		numPlayers.setText("Number of players:\t" + hModel.getPlayer());
+	}
+
+	private void closeServer() {
+		hControl.updateScreen(Mode.MAIN);
+		hControl.closeServer();
 	}
 }

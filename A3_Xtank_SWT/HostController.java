@@ -14,9 +14,15 @@ public class HostController {
 		hostModel.setMode(mode);
 	}
 	
-	public void createServerSocket(int port) {
+	public void createServer(int port, int mapNum) {
 		try {
-			hostModel.setServerSocket(port);
+			hostModel.setServer(port, mapNum);
 		} catch (Exception e) {}
+	}
+
+	public void closeServer() {
+		if (hostModel.getServer() != null)
+			hostModel.getServer().closeServer();
+		hostModel.deleteServer();
 	}
 }
