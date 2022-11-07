@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -17,7 +18,7 @@ public class ClientModel {
 	private ObjectOutputStream 	out;
 	private InputPacket			new_tank;
 	private Tank				tank;
-	private ArrayList<Tank>		tanks; // TODO: change to map
+	private HashMap<Integer, Tank>		tanks;
 	private Runner				runnable;
 	private ExecutorService		pool;
 	
@@ -25,7 +26,7 @@ public class ClientModel {
 	
 	public ClientModel() {
 		mode = Mode.MAIN;
-		tanks = new ArrayList<>();
+		tanks = new HashMap<>();
 		tank = new Tank(0, 0, 0);
 	}
 	
@@ -45,21 +46,26 @@ public class ClientModel {
         	socket = new Socket(ip, port);
         	        	
         	in = new ObjectInputStream(socket.getInputStream());
-        	System.out.println(in);
         	out = new ObjectOutputStream(socket.getOutputStream());
         	out.flush();
         	try {
         		new_tank = (InputPacket)in.readObject();
-        		System.out.println(new_tank.id);
+        		int num_tanks = (Integer)in.readObject();
+        		for (int i = 0; i < num_tanks; i++) {
+        			InputPacket enemy_tank = (InputPacket)in.readObject();
+        			System.out.println("Adding enemy: " + enemy_tank.id);
+        			tanks.put(enemy_tank.id, new Tank(0, 0, enemy_tank.id));
+        			tanks.get(enemy_tank.id).set(enemy_tank.x, enemy_tank.y, enemy_tank.angle);
+        		}
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         	tank = new Tank(new_tank.x, new_tank.y, new_tank.id);
-        	
+        	tanks.put(tank.getID(), tank);
         }
         catch (Exception e) {
-        	System.out.println("error");
+        	//System.out.println("error");
         }
         
         if (socket.isConnected()) {        	
@@ -72,6 +78,10 @@ public class ClientModel {
 		
 	public Tank getTank() {
 		return tank;
+	}
+	
+	public HashMap<Integer, Tank> getTanks() {
+		return tanks;
 	}
 	
 	public ObjectInputStream getInput() {
@@ -108,16 +118,19 @@ public class ClientModel {
 						InputPacket packet = null;
 						try {
 							packet = (InputPacket)in.readObject();
+							System.out.println("Packet move: " + packet.id + " " + tank.getID());
 						} catch (ClassNotFoundException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 						// used if new tank added after this local tank was added
-						if (packet.id >= tanks.size()) {
-							tanks.add(new Tank(packet.x, packet.y, packet.id));
+						if (packet.id == tank.getID()) {
+							tank.set(packet.x, packet.y, packet.angle);
 						}
-						tank.set(packet.x, packet.y, packet.angle);
-						//canvas.redraw();
+						else if (!tanks.containsKey(packet.id)) {
+							tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id));
+							tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+						}
 					}
 				}
 				catch(IOException ex) {

@@ -77,14 +77,28 @@ public class Server
             	int initial_x = 50;
             	int initial_y = 50;
             	int initial_angle = 0;
-            	out.writeObject(new InputPacket(tanks.size(), initial_x, initial_y, initial_angle, false));
+            	new_id = getNewID();
+            	System.out.println("Adding new tank: " + new_id);
+                // add new tank
+            	out.writeObject(new InputPacket(new_id, initial_x, initial_y, initial_angle, false));
+            	System.out.println(1);
+            	// send num of tanks
+            	out.writeObject(tanks.size());
+            	System.out.println(2);
+            	// loop through all tanks and send
+            	for (var key : tanks.keySet()) {
+            		InputPacket packet = new InputPacket(tanks.get(key).getID(),
+            				tanks.get(key).getX(), tanks.get(key).getX(), tanks.get(key).getRotate(), false);
+            		out.writeObject(packet);
+            	}
+            	//System.out.println(3);
+            	tanks.put(new_id, new Tank(initial_x, initial_y, new_id));
             	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-            	System.out.println("cat");
+            	
+            	//System.out.println(4);
             	
                 sq.add(out);
-                new_id = getNewID();
-                // add new tank
-                tanks.put(new_id, new Tank(initial_x, initial_y, new_id));
+                //System.out.println(5);
                 // send old tanks to new tank
                 
                 
@@ -94,7 +108,7 @@ public class Server
                 	// update tank position server side
                 	final int SPEED = 5;
                 	tanks.get(input.id).rotate(-input.x * SPEED);
-                	System.out.println(tanks.get(input.id).getRotate());
+                	//System.out.println(tanks.get(input.id).getRotate());
                 	tanks.get(input.id).moveForward(-input.y * SPEED);
                 	if (map.collision(tanks.get(input.id).getX(),
             			tanks.get(input.id).getY(),
@@ -105,7 +119,6 @@ public class Server
         			}
                 	for (ObjectOutputStream o: sq)
                 	{
-                    	System.out.println("o = " + o);
                     	InputPacket to_client = new InputPacket(input.id, 
                     			tanks.get(input.id).getX(), tanks.get(input.id).getY(),
                     			tanks.get(input.id).getRotate(), false);

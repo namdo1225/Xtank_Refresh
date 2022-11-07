@@ -21,7 +21,7 @@ public class Tank {
 	}
 	
 	public void moveForward(int speed) {
-		System.out.println(getDirectionX() + " " + getDirectionY());
+		//System.out.println(getDirectionX() + " " + getDirectionY());
 		this.x += (float)getDirectionX() * (float)speed;
 		this.y -= (float)getDirectionY() * (float)speed;
 	}
