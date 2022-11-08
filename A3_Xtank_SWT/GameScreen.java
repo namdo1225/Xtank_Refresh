@@ -97,21 +97,6 @@ public class GameScreen extends Screen {
 				if (isConnected()) {
 
 					InputPacket packet = new InputPacket(0);
-					switch (e.character) {
-					case 'w':
-						packet.y = -1;
-						break;
-					case 's':
-						packet.y = 1;
-						break;
-					case 'a':
-						packet.x = -1;
-						break;
-					case 'd':
-						packet.x = 1;
-						break;
-					}
-					
 					switch (e.keyCode) {
 					case SWT.ARROW_UP:
 						packet.y = -1;
