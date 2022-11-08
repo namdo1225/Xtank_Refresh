@@ -3,6 +3,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -48,8 +49,9 @@ public class ClientModel {
 		terminate = false;
 		
 		try {
-        	socket = new Socket(ip, port);
-        	        	
+        	socket = new Socket();
+        	socket.connect(new InetSocketAddress(ip, port), 100);
+        	
         	in = new ObjectInputStream(socket.getInputStream());
         	out = new ObjectOutputStream(socket.getOutputStream());
         	out.flush();
@@ -112,6 +114,20 @@ public class ClientModel {
 	
 	public void deleteSocket() {
 		socket = null;
+	}
+	
+	public void deleteInput() {
+		in = null;
+	}
+	
+	public void deleteOutput() {
+		out = null;
+	}
+	
+	public void resetTankData() {
+		tanks = new HashMap<>();
+		bullets = new ArrayList<>();
+		tank = new Tank(0, 0, 0);
 	}
 	
 	public void deleteThreadPool() {

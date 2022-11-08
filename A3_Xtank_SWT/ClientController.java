@@ -19,11 +19,15 @@ public class ClientController {
 	
 	public void endGame() {
 		try {
-			if (clientModel.getInput() != null)
+			if (clientModel.getInput() != null) {
 				clientModel.getInput().close();
+				clientModel.deleteInput();
+			}
 			
-			if (clientModel.getOutput() != null)
+			if (clientModel.getOutput() != null) {
 				clientModel.getOutput().close();
+				clientModel.deleteOutput();
+			}
 			
 			if (clientModel.getSocket() != null)
 				clientModel.getSocket().close();
@@ -37,6 +41,8 @@ public class ClientController {
 		}
 		
 		clientModel.deleteSocket();
+		
+		clientModel.resetTankData();
 	}
 	
 	public void closeInput() {

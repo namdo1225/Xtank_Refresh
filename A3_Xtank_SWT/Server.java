@@ -28,6 +28,8 @@ public class Server
 
 	private static ServerSocket						listener;
 	private static ExecutorService					pool;
+	private static ExecutorService					closeThread;
+	
 	private static ExecutorService					bullet_thread;
 	private static Lock								bullet_lock;
 	private static GameMap							map;
@@ -53,7 +55,7 @@ public class Server
         	bullet_thread = Executors.newFixedThreadPool(1);
         	bullet_lock = new ReentrantLock();
             pool = Executors.newFixedThreadPool(4);
-            pool.execute(new XTankConnection(listener));
+            pool.execute(new XTankConnection());
             bullet_thread.execute(new BulletManager());
             
         } catch (Exception e) {}
@@ -72,19 +74,25 @@ public class Server
     }
     
     public void stopNewConnection() {
-    	//isAcceptingNew = false;
+    	isAcceptingNew = false;
     	acceptConnection = false;
-    	System.out.println("ferwe");
     	
-    	if (pool != null) {
+    	if (acceptConnection) {
+    	
+    		if (pool != null) {
 
-    		pool.shutdownNow();
-    		try {
-    			pool.awaitTermination(100, TimeUnit.MICROSECONDS);
-    		} catch (InterruptedException e) {
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
+    			pool.shutdownNow();
+    			try {
+    				pool.awaitTermination(100, TimeUnit.MICROSECONDS);
+    				System.out.println(pool.isShutdown() + " " + pool.isTerminated());
+    			} catch (InterruptedException e) {
+    				// TODO Auto-generated catch block
+    				e.printStackTrace();
+    			}
     		}
+
+    		closeThread = Executors.newFixedThreadPool(1);
+    		closeThread.execute(new XTankClose());
     	}
     }
 
@@ -233,13 +241,10 @@ public class Server
     
     protected static class XTankConnection implements Runnable {
         private Socket					socket;
-        private static ServerSocket		listener;
-        private static HostModel		hostModel;
         private static int				clients;
         
-        public XTankConnection(ServerSocket listener) {
+        public XTankConnection() {
         	clients = 0;
-        	XTankConnection.listener = listener;
         }
 
         @Override
@@ -247,12 +252,19 @@ public class Server
         {
         	while (acceptConnection) {
                 try {
- 
-                    socket = listener.accept();
+                	if (isAcceptingNew)
+                		socket = listener.accept();
+                	
+                	if (!isAcceptingNew)
+                		if (socket != null)
+                			socket.close();
+                	
+                	if (isAcceptingNew) {
             		clients++;
 
             		ExecutorService poolTest = Executors.newFixedThreadPool(5);
             		poolTest.execute(new XTankManager(socket, this));
+                	}
                 } catch (IOException e) {
                 	acceptConnection = false;
                 }
@@ -275,6 +287,23 @@ public class Server
         }
     }
 
+    protected static class XTankClose implements Runnable {
+        private Socket					socket;
+
+        @Override
+        public void run() 
+        {
+        	while (true) {
+                try {
+                	socket = listener.accept();
+                	if (socket != null)
+                		socket.close();
+                } catch (IOException e) {}
+        	}
+
+        }
+    }
+    
     public void closeServer() {
     	acceptConnection = false;
     	
@@ -285,6 +314,9 @@ public class Server
     	
     	if (pool != null)
     		pool.shutdownNow();
+    	
+    	if (closeThread != null)
+    		closeThread.shutdownNow();
     }
 }
 
