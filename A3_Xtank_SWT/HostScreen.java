@@ -8,9 +8,12 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 
 public class HostScreen extends Screen {
@@ -36,7 +39,11 @@ public class HostScreen extends Screen {
 	private Button		selectMap;
 	private Button		backMap;
 	
+	private Label		livesText;
+	private Slider		selectLives;
+	
 	private int			mapID;
+	private int			maxLives;
 	
 	public HostScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
@@ -84,9 +91,25 @@ public class HostScreen extends Screen {
 		map2.setText("Map 2");
 		map1.addSelectionListener(
 				SelectionListener.widgetSelectedAdapter(e-> mapID = 2));
+
+		livesText = new Label(compositeMap, SWT.BALLOON);
+		livesText.setFont(new Font(display,"Times New Roman", 14, SWT.BOLD ));
+		livesText.setText("Lives: 1");
 		
+		selectLives = new Slider(compositeMap, SWT.HORIZONTAL);
+		selectLives.setMinimum(10);
+		selectLives.setMaximum(60);
+		selectLives.setIncrement(10); 
+		selectLives.setSelection(10);
+		selectLives.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event e) {
+            	maxLives = selectLives.getSelection() / 10;
+            	livesText.setText("Lives: " + maxLives);
+            }
+        });		
 		selectMap = new Button(compositeMap, SWT.PUSH);
-		selectMap.setText("Select Map");
+		selectMap.setText("Continue");
 		selectMap.addSelectionListener(
 				SelectionListener.widgetSelectedAdapter(e-> mapSelected()));
 		
@@ -133,7 +156,7 @@ public class HostScreen extends Screen {
 	private void mapSelected() {
 		compositeNetwork.setEnabled(true);
 		compositeMap.setEnabled(false);
-		selectMap.setText("YOU CAN NOW CLICK ON THE SCREEN TO THE RIGHT.");
+		selectMap.setText("You can now click on the screen to the right.");
 	}
 	
 	private void hostServer() {
@@ -175,7 +198,7 @@ public class HostScreen extends Screen {
 		hControl.closeServer();
 		compositeNetwork.setEnabled(false);
 		compositeMap.setEnabled(true);
-		selectMap.setText("Select Map");
+		selectMap.setText("Continue");
 		next.setEnabled(false);
 		next.setText("Next: Please click 'Update' first!");
 		update.setEnabled(true);
