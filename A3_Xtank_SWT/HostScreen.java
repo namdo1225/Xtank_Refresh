@@ -8,9 +8,12 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Text;
 
 public class HostScreen extends Screen {
@@ -36,7 +39,11 @@ public class HostScreen extends Screen {
 	private Button		selectMap;
 	private Button		backMap;
 	
+	private Label		livesText;
+	private Slider		selectLives;
+	
 	private int			mapID;
+	private int			maxLives;
 	
 	public HostScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
@@ -63,12 +70,12 @@ public class HostScreen extends Screen {
 		guide = new Label(compositeMap, SWT.BALLOON);
 		guide.setText("'Update' create new server socket with the typed-in port number."
 				+ "\nYou cannot click 'Next' to start the game "
-				+ "unless 2 or more players are in.\nYour input is validated. "
-				+ "Program will crash if your number is out of int's bounds.\nYou cannot host AND play the game."
-				+ "\n\nWell-known port range: 1024-65,535\tLocalhost: 127.0.0.1\nYour (probably wrong) IP: "
+				+ "unless 2 or more players are in.\n"
+				+ "Program will crash if your number is out of int's bounds."
+				+ "\nWell-known port range: 1024-65,535\tLocalhost: 127.0.0.1\nYour (probably wrong) IP: "
 				+ address
-				+ "\n\nPick a map FIRST! You cannot change your selection once it is chosen:");
-		guide.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));
+				+ "\nPick maps and lives FIRST! You cannot change your selection once it is chosen:");
+		guide.setFont(new Font(display,"Times New Roman", 8, SWT.BOLD ));
 		guide.setAlignment(SWT.CENTER);
 		
 		mapGroup = new Group(compositeMap, SWT.NONE);
@@ -84,9 +91,25 @@ public class HostScreen extends Screen {
 		map2.setText("Map 2");
 		map1.addSelectionListener(
 				SelectionListener.widgetSelectedAdapter(e-> mapID = 2));
+
+		livesText = new Label(compositeMap, SWT.BALLOON);
+		livesText.setFont(new Font(display,"Times New Roman", 14, SWT.BOLD ));
+		livesText.setText("Lives: 1");
 		
+		selectLives = new Slider(compositeMap, SWT.HORIZONTAL);
+		selectLives.setMinimum(10);
+		selectLives.setMaximum(60);
+		selectLives.setIncrement(10); 
+		selectLives.setSelection(10);
+		selectLives.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event e) {
+            	maxLives = selectLives.getSelection() / 10;
+            	livesText.setText("Lives: " + maxLives);
+            }
+        });		
 		selectMap = new Button(compositeMap, SWT.PUSH);
-		selectMap.setText("Select Map");
+		selectMap.setText("Continue");
 		selectMap.addSelectionListener(
 				SelectionListener.widgetSelectedAdapter(e-> mapSelected()));
 		
@@ -116,8 +139,9 @@ public class HostScreen extends Screen {
 				SelectionListener.widgetSelectedAdapter(e-> hostServer()));
 		
 		next = new Button(compositeNetwork, SWT.PUSH);
-		next.setText("Next");
-		next.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> validateInput()));
+		next.setEnabled(false);
+		next.setText("Next: Please click 'Update' first!");
+		next.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> startGame()));
 		
 		backServer = new Button(compositeNetwork, SWT.PUSH);
 		backServer.setText("Back");
@@ -132,14 +156,19 @@ public class HostScreen extends Screen {
 	private void mapSelected() {
 		compositeNetwork.setEnabled(true);
 		compositeMap.setEnabled(false);
-		selectMap.setText("YOU CAN NOW CLICK ON THE SCREEN TO THE RIGHT.");
+		selectMap.setText("You can now click on the screen to the right.");
 	}
 	
 	private void hostServer() {
-		if (validateInput())
+		if (validateInput()) {
 			try {
 				hControl.createServer(Integer.parseInt(port.getText()), mapID);
 			} catch (Exception e) {}
+		
+			next.setEnabled(true);
+			next.setText("Next");
+			update.setEnabled(false);
+		}
 		else {
 			port.setMessage("Enter port number: Your input was invalid.");
 			port.setText("");
@@ -160,11 +189,18 @@ public class HostScreen extends Screen {
 		numPlayers.setText("Number of players:\t" + hModel.getPlayer());
 	}
 
+	private void startGame() {
+		hControl.stopNewConnection();
+	}
+	
 	private void closeServer() {
 		hControl.updateScreen(Mode.MAIN);
 		hControl.closeServer();
 		compositeNetwork.setEnabled(false);
 		compositeMap.setEnabled(true);
-		selectMap.setText("Select Map");
+		selectMap.setText("Continue");
+		next.setEnabled(false);
+		next.setText("Next: Please click 'Update' first!");
+		update.setEnabled(true);
 	}
 }

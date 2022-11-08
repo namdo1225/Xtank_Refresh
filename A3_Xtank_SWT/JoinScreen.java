@@ -14,19 +14,35 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 public class JoinScreen extends Screen {
-	private Label		title;
+	private Composite	compositeTank;
+
+	private Label		titleTank;
+	
+	private Group		tankGroup;
+	private Button		tank1;
+	private Button		tank2;
+	
+	private Button		backTank;
+	private Button		selectTank;
+	
+	private Composite	compositeJoin;
+
+	private Label		titleJoin;
 	private Label		error;
 	
 	private Text		iP;
 	private Text		port;
 	
 	private Button		next;
-	private Button		back;
+	private Button		backJoin;
+	
+	private int			tankID;
 	
 	public JoinScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
@@ -36,53 +52,101 @@ public class JoinScreen extends Screen {
 	protected Composite makeComposite(Shell shell, Display display) {
 		composite = new Composite(shell, SWT.COLOR_WHITE);
 		
+		compositeTank = new Composite(composite, SWT.TRANSPARENT);
+		compositeJoin = new Composite(composite, SWT.TRANSPARENT);
+
+		compositeTank.setLayout(new FillLayout(SWT.VERTICAL));
+		compositeJoin.setLayout(new FillLayout(SWT.VERTICAL));
+		compositeJoin.setEnabled(false);
+		
 		String address = "";
 		try {
 			address = InetAddress.getLocalHost().toString();
 		} catch (UnknownHostException e1) {}
 		
-		title = new Label(composite, SWT.BALLOON);
-		title.setText("Set your IP address and port number and click 'Next'. \n'UAWiFi' "
-				+ "does not work consistently for us. Your inputs are validated."
-				+ "You will crash the program if the numbers entered are out of int's bounds.\n"
+		titleTank = new Label(compositeTank, SWT.BALLOON);
+		titleTank.setText("Set your IP address and port number and click 'Next'. \n'UAWiFi' "
+				+ "does not work consistently for us. Your inputs are validated.\nFIRST, select "
+				+ "your tank model. You cannot change your selection after clicking 'Continue'.");
+		titleTank.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));
+		titleTank.setAlignment(SWT.CENTER);
+		
+		tankGroup = new Group(compositeTank, SWT.NONE);
+		tankGroup.setLayout(new FillLayout(SWT.HORIZONTAL));
+		
+		tank1 = new Button(tankGroup, SWT.RADIO);
+		tank1.setText("Tank 1, Weapon: Normal, Armor: Normal");
+		tank1.setSelection(true);
+		tank1.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> tankID = 1));
+		
+		tank2 = new Button(tankGroup, SWT.RADIO);
+		tank2.setText("Tank 2, Weapon: Fast, Armor: Weak");
+		tank2.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> tankID = 2));
+		
+		selectTank = new Button(compositeTank, SWT.PUSH);
+		selectTank.setText("Continue");
+		selectTank.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> tankSelected()));
+		
+		backTank = new Button(compositeTank, SWT.PUSH);
+		backTank.setText("Back");
+		backTank.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> goBack()));
+		
+		titleJoin = new Label(compositeJoin, SWT.BALLOON);
+		titleJoin.setText("You will crash the program if the numbers entered are out of int's bounds.\n"
 				+ "Well-known port range: 1024-65,535\tLocalhost: 127.0.0.1\tYour (probably wrong) IP: "
 				+ address);
-		title.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));
-		title.setAlignment(SWT.CENTER);
+		titleJoin.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));
+		titleJoin.setAlignment(SWT.CENTER);
 		
-		error = new Label(composite, SWT.BALLOON);
+		error = new Label(compositeJoin, SWT.BALLOON);
 		error.setFont(new Font(display, "Times New Roman", 12, SWT.BOLD ));
 		error.setAlignment(SWT.CENTER);
 		error.setForeground(display.getSystemColor(SWT.COLOR_RED));
 		
-		iP = new Text(composite, SWT.LEFT | SWT.BORDER);
+		iP = new Text(compositeJoin, SWT.LEFT | SWT.BORDER);
 		iP.setMessage("Enter IPv4 address:");
 		iP.setText("127.0.0.1");
 		
-		port = new Text(composite, SWT.LEFT | SWT.BORDER);
+		port = new Text(compositeJoin, SWT.LEFT | SWT.BORDER);
 		port.setMessage("Enter port number:");
 		port.setText("8080");
 		
-		next = new Button(composite, SWT.PUSH);
+		next = new Button(compositeJoin, SWT.PUSH);
 		next.setText("Next");
 		next.addSelectionListener(
 				SelectionListener.widgetSelectedAdapter(e-> joinServer()));
 		
-		back = new Button(composite, SWT.PUSH);
-		back.setText("Back");
-		back.addSelectionListener(
-				SelectionListener.widgetSelectedAdapter(e-> cControl.updateScreen(Mode.MAIN)));
+		backJoin = new Button(compositeJoin, SWT.PUSH);
+		backJoin.setText("Back");
+		backJoin.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> goBack()));
 		
-		composite.setLayout(new FillLayout(SWT.VERTICAL));
+		composite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		return composite;
+	}
+	
+	private void goBack() {
+		compositeJoin.setEnabled(false);
+		compositeTank.setEnabled(true);
+		selectTank.setText("Continue");
+		cControl.updateScreen(Mode.MAIN);
+	}
+	
+	private void tankSelected() {
+		compositeJoin.setEnabled(true);
+		compositeTank.setEnabled(false);
+		selectTank.setText("You can now click on the screen to the right.");
 	}
 	
 	private void joinServer() {
 		if (validateInput())
 			try {
 				cControl.createSocket(iP.getText(), Integer.parseInt(port.getText()));
-				
 				if (cModel.getSocket() != null && cModel.getSocket().isConnected())
 					cControl.updateScreen(Mode.GAME);
 				else

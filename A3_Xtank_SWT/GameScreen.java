@@ -123,33 +123,31 @@ public class GameScreen extends Screen {
 
 		canvas.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
-				InputPacket packet = new InputPacket(cModel.getTank().getID());
-				switch (e.character) {
-				case 'w':
-					packet.y = -1;
-					break;
-				case 's':
-					packet.y = 1;
-					break;
-				case 'a':
-					packet.x = -1;
-					break;
-				case 'd':
-					packet.x = 1;
-					break;
-				case ' ':
-					packet.shoot = true;
-					break;
-				}
-				//System.out.println("key " + e.character);
-				// update tank location
-				//x += directionX;
-				//y += directionY;
-				
-				cControl.writeOut(packet);
-				canvas.redraw();
-				checkConnection();
-			}
+				if (isConnected()) {
+
+					InputPacket packet = new InputPacket(0);
+					switch (e.character) {
+					case 'w':
+						packet.y = -1;
+						break;
+					case 's':
+						packet.y = 1;
+						break;
+					case 'a':
+						packet.x = -1;
+						break;
+					case 'd':
+						packet.x = 1;
+						break;
+					}
+					//System.out.println("key " + e.character);
+					// update tank location
+					//x += directionX;
+					//y += directionY;
+
+					cControl.writeOut(packet);
+					canvas.redraw();
+      }
 			public void keyReleased(KeyEvent e) {}
 		});
 
@@ -251,35 +249,33 @@ public class GameScreen extends Screen {
 			public void mouseDoubleClick(MouseEvent e) {} 
 		});
 
-		canvas.addKeyListener(new KeyListener() {
+			canvas.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
-				InputPacket packet = new InputPacket(cModel.getTank().getID());
-				switch (e.character) {
-				case 'w':
-					packet.y = -1;
-					break;
-				case 's':
-					packet.y = 1;
-					break;
-				case 'a':
-					packet.x = -1;
-					break;
-				case 'd':
-					packet.x = 1;
-					break;
-				case ' ':
-					packet.shoot = true;
-					break;
-				}
-				//System.out.println("key " + e.character);
-				// update tank location
-				//x += directionX;
-				//y += directionY;
-				
-				cControl.writeOut(packet);
-				canvas.redraw();
-				checkConnection();
-			}
+				if (isConnected()) {
+
+					InputPacket packet = new InputPacket(0);
+					switch (e.character) {
+					case 'w':
+						packet.y = -1;
+						break;
+					case 's':
+						packet.y = 1;
+						break;
+					case 'a':
+						packet.x = -1;
+						break;
+					case 'd':
+						packet.x = 1;
+						break;
+					}
+					//System.out.println("key " + e.character);
+					// update tank location
+					//x += directionX;
+					//y += directionY;
+
+					cControl.writeOut(packet);
+					canvas.redraw();
+      }
 			public void keyReleased(KeyEvent e) {}
 		});
 
@@ -314,7 +310,9 @@ public class GameScreen extends Screen {
 			serverStatus.setForeground(compositePlayer.getDisplay().getSystemColor(SWT.COLOR_RED));
 			
 			cControl.endGame();
+			return false;
 		}
+		return true;
 	}
 	
 	public void endGame() {

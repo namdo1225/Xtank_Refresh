@@ -31,8 +31,10 @@ public class ClientController {
 		}
 		catch (IOException e) {}
 		
-		if (clientModel.getRun() != null)
+		if (clientModel.getRun() != null) {
 			clientModel.getRun().stop();
+			clientModel.deleteThreadPool();
+		}
 		
 		clientModel.deleteSocket();
 	}
