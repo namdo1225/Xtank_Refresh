@@ -231,7 +231,7 @@ public class Server
             	sq.remove(out);
             	if (new_id > -1)
             		tanks.remove(new_id);
-            	connector.setPlCount(connector.getPlCount() - 1);
+            	Server.XTankConnection.setPlCount(Server.XTankConnection.getPlCount() - 1);
                 try { socket.close(); } 
                 catch (IOException e) {}
                 System.out.println("Closed: " + socket);

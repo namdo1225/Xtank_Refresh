@@ -47,8 +47,8 @@ public class GameScreen extends Screen {
 	}
 	
 	public GameScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
-			ClientModel cMod, HostModel hMod, int mapID, int tankID) {
-		super(shell, display, cCon, hCon, cMod, hMod, mapID, tankID);
+			ClientModel cMod, HostModel hMod, int mapID, int tankModel, int tankID) {
+		super(shell, display, cCon, hCon, cMod, hMod, mapID, tankModel, tankID);
 	}
 	
 	private void makeCompPart1(Shell shell, Display display) {
@@ -147,12 +147,13 @@ public class GameScreen extends Screen {
 		composite.setLayout(layout);
 	}
 	
-	private void makeCompChange(Display display, int mapID, int tankID) {
+	
+	private void makeCompChange(Display display, int mapID, int tankModel, int tankID) {
 		map = new GameMap(display, compositeGame, mapID);
 		
 		color1 = SWT.COLOR_DARK_GREEN;
 		color2 = SWT.COLOR_BLACK;
-		if (tankID == 2) {
+		if (tankModel == 2) {
 			color1 = SWT.COLOR_DARK_RED;
 			color2 = SWT.COLOR_GRAY;
 		}
@@ -176,6 +177,8 @@ public class GameScreen extends Screen {
 				event.gc.setLineWidth(4);
 				event.gc.drawLine(tank.getX()+(tank.width/2), tank.getY()+(tank.width/2), tank.getX()+(tank.width/2), tank.getY()-15);
 				//canvas.setBounds(tank.getX(), tank.getY(), 50, 100);
+				event.gc.setForeground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+				event.gc.drawText(String.valueOf(tankID), tank.getX() + 10, tank.getY()+(tank.width/2));
 				map.collision(tank.getX(), tank.getY(), tank.getX() + tank.height, tank.getY() + tank.height);
 			}
 			
@@ -191,16 +194,17 @@ public class GameScreen extends Screen {
 	@Override
 	protected Composite makeComposite(Shell shell, Display display) {
 		makeCompPart1(shell, display);
-		makeCompChange(display, 1, 1);
+		makeCompChange(display, 1, 1, 1);
 		makeCompPart2();
 		
 		return composite;
 	}
 	
 	@Override
-	protected Composite makeCompositeAndMap(Shell shell, Display display, int mapID, int tankID) {
+	protected Composite makeCompositeAndMap(Shell shell, Display display, 
+			int mapID, int tankModel, int tankID) {
 		makeCompPart1(shell, display);
-		makeCompChange(display, mapID, tankID);
+		makeCompChange(display, mapID, tankModel, tankID);
 		makeCompPart2();
 		
 		return composite;
