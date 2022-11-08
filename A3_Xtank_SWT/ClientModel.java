@@ -19,14 +19,16 @@ public class ClientModel {
 	private InputPacket					new_tank;
 	private Tank						tank;
 	private HashMap<Integer, Tank>		tanks;
-	private Runner						runnable;
-	private ExecutorService				pool;
+	private ArrayList<Bullet>	bullets;
+	private Runner				runnable;
+	private ExecutorService		pool;
 	
 	private boolean						terminate;
 	
 	public ClientModel() {
 		mode = Mode.MAIN;
 		tanks = new HashMap<>();
+		bullets = new ArrayList<>();
 		tank = new Tank(0, 0, 0);
 	}
 	
@@ -49,6 +51,11 @@ public class ClientModel {
         	out = new ObjectOutputStream(socket.getOutputStream());
         	out.flush();
         	try {
+        		int map_id = (Integer)in.readObject();
+        		// Somehow change GameMap here
+        		
+        		clientView.recreateGameScreen(map_id);
+        		
         		new_tank = (InputPacket)in.readObject();
         		int num_tanks = (Integer)in.readObject();
         		for (int i = 0; i < num_tanks; i++) {
@@ -125,18 +132,38 @@ public class ClientModel {
 						InputPacket packet = null;
 						try {
 							packet = (InputPacket)in.readObject();
-							System.out.println("Packet move: " + packet.id + " " + tank.getID());
+							System.out.println(in + " " + packet.id + " " + tank.getID());
 						} catch (ClassNotFoundException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						// used if new tank added after this local tank was added
-						if (packet.id == tank.getID()) {
-							tank.set(packet.x, packet.y, packet.angle);
+						if (packet.is_bullet) {
+							// new bullet
+							if (packet.id > bullets.size()) {
+								bullets.add(new Bullet(packet.x, packet.y, 0, 0));
+							}
+							// update bullet
+							else {
+								bullets.get(packet.id).set(packet.x, packet.y);
+							}
+							// delete bullet
+							if (packet.shoot) {
+								bullets.remove(packet.id);
+							}
 						}
-						else if (!tanks.containsKey(packet.id)) {
-							tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id));
-							tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+						else {
+							// used if new tank added after this local tank was added
+							if (packet.id == tank.getID()) {
+								tank.set(packet.x, packet.y, packet.angle);
+								tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+							}
+							else if (!tanks.containsKey(packet.id)) {
+								tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id));
+								tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+							}
+							else {
+								tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+							}
 						}
 					}
 				}
@@ -157,5 +184,9 @@ public class ClientModel {
 		public void stop() {
 			terminate = true;			
 		}
+	}
+
+	public ArrayList<Bullet> getBullets() {
+		return bullets;
 	};
 }
