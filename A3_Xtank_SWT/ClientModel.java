@@ -11,18 +11,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ClientModel {	
-	private XTankUI				clientView;
-	private Mode				mode;
-	private	Socket				socket;
-	private ObjectInputStream 	in;
-	private ObjectOutputStream 	out;
-	private InputPacket			new_tank;
-	private Tank				tank;
+	private XTankUI						clientView;
+	private Mode						mode;
+	private	Socket						socket;
+	private ObjectInputStream 			in;
+	private ObjectOutputStream 			out;
+	private InputPacket					new_tank;
+	private Tank						tank;
 	private HashMap<Integer, Tank>		tanks;
-	private Runner				runnable;
-	private ExecutorService		pool;
+	private Runner						runnable;
+	private ExecutorService				pool;
 	
-	private boolean				terminate;
+	private boolean						terminate;
 	
 	public ClientModel() {
 		mode = Mode.MAIN;
