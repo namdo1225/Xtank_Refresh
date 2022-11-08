@@ -16,6 +16,8 @@ public class GameMap {
 	private int[] w;
 	private int[] h;
 	
+	private int id;
+	
 	// Client
 	public GameMap(Display display, Composite composite, int mapNum) {
 		obstacles = new ArrayList<Canvas>();
@@ -35,10 +37,15 @@ public class GameMap {
 	
 	// Server
 	public GameMap(int mapNum) {
+		id = mapNum;
 		if (mapNum == 2)
 			setMap2();
 		else
 			setMap1();
+	}
+	
+	public int getID() {
+		return id;
 	}
 	
 	private void setMap1() {

@@ -110,7 +110,7 @@ public class GameScreen extends Screen {
 
 		canvas.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
-				InputPacket packet = new InputPacket(0);
+				InputPacket packet = new InputPacket(cModel.getTank().getID());
 				switch (e.character) {
 				case 'w':
 					packet.y = -1;

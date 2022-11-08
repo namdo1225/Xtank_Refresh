@@ -79,6 +79,7 @@ public class Server
             	int initial_angle = 0;
             	new_id = getNewID();
             	System.out.println("Adding new tank: " + new_id);
+            	out.writeObject(map.getID());
                 // add new tank
             	out.writeObject(new InputPacket(new_id, initial_x, initial_y, initial_angle, false));
             	System.out.println(1);
@@ -100,8 +101,6 @@ public class Server
                 sq.add(out);
                 //System.out.println(5);
                 // send old tanks to new tank
-                
-                
                 while (true)
                 {
                 	InputPacket input = (InputPacket)in.readObject();

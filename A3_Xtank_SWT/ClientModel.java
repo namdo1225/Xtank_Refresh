@@ -49,6 +49,11 @@ public class ClientModel {
         	out = new ObjectOutputStream(socket.getOutputStream());
         	out.flush();
         	try {
+        		int map_id = (Integer)in.readObject();
+        		// Somehow change GameMap here
+        		
+        		
+        		
         		new_tank = (InputPacket)in.readObject();
         		int num_tanks = (Integer)in.readObject();
         		for (int i = 0; i < num_tanks; i++) {
@@ -118,7 +123,7 @@ public class ClientModel {
 						InputPacket packet = null;
 						try {
 							packet = (InputPacket)in.readObject();
-							System.out.println("Packet move: " + packet.id + " " + tank.getID());
+							System.out.println(in + " " + packet.id + " " + tank.getID());
 						} catch (ClassNotFoundException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -126,9 +131,13 @@ public class ClientModel {
 						// used if new tank added after this local tank was added
 						if (packet.id == tank.getID()) {
 							tank.set(packet.x, packet.y, packet.angle);
+							tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
 						}
 						else if (!tanks.containsKey(packet.id)) {
 							tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id));
+							tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+						}
+						else {
 							tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
 						}
 					}
