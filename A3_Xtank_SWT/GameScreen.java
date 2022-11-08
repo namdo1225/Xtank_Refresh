@@ -58,7 +58,7 @@ public class GameScreen extends Screen {
 		compositePlayer.setLayout(new FillLayout(SWT.VERTICAL));
 
 		plHeader = new Label(compositePlayer, SWT.BALLOON);
-		plHeader.setText("Players:");
+		plHeader.setText("You are\nplayer:\n");
 		plHeader.setFont(new Font(display,"Times New Roman", 14, SWT.BOLD ));
 		plHeader.setAlignment(SWT.LEFT);
 		
@@ -111,6 +111,22 @@ public class GameScreen extends Screen {
 						packet.x = 1;
 						break;
 					}
+					
+					switch (e.keyCode) {
+					case SWT.ARROW_UP:
+						packet.y = -1;
+						break;
+					case SWT.ARROW_DOWN:
+						packet.y = 1;
+						break;
+					case SWT.ARROW_LEFT:
+						packet.x = -1;
+						break;
+					case SWT.ARROW_RIGHT:
+						packet.x = 1;
+						break;
+					}
+					
 					//System.out.println("key " + e.character);
 					// update tank location
 					//x += directionX;
