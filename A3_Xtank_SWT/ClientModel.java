@@ -19,11 +19,14 @@ public class ClientModel {
 	private InputPacket					new_tank;
 	private Tank						tank;
 	private HashMap<Integer, Tank>		tanks;
-	private ArrayList<Bullet>	bullets;
-	private Runner				runnable;
-	private ExecutorService		pool;
+	private ArrayList<Bullet>			bullets;
+	private Runner						runnable;
+	private ExecutorService				pool;
+	
+	private	int							tankModel;
 	
 	private boolean						terminate;
+	
 	
 	public ClientModel() {
 		mode = Mode.MAIN;
@@ -54,7 +57,7 @@ public class ClientModel {
         		int map_id = (Integer)in.readObject();
         		// Somehow change GameMap here
         		
-        		clientView.recreateGameScreen(map_id);
+        		clientView.recreateGameScreen(map_id, tankModel);
         		
         		new_tank = (InputPacket)in.readObject();
         		int num_tanks = (Integer)in.readObject();
@@ -120,6 +123,10 @@ public class ClientModel {
 	
 	public boolean getTerminate() {
 		return terminate;
+	}
+	
+	public void setTankModel(int model) {
+		tankModel = model;
 	}
 	
 	public class Runner implements Runnable {

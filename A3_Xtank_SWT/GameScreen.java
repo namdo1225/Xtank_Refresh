@@ -38,14 +38,17 @@ public class GameScreen extends Screen {
 	
 	private GameMap			map;
 	
+	private	int				color1;
+	private int				color2;
+	
 	public GameScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
 		super(shell, display, cCon, hCon, cMod, hMod);
 	}
 	
 	public GameScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
-			ClientModel cMod, HostModel hMod, int mapID) {
-		super(shell, display, cCon, hCon, cMod, hMod, mapID);
+			ClientModel cMod, HostModel hMod, int mapID, int tankID) {
+		super(shell, display, cCon, hCon, cMod, hMod, mapID, tankID);
 	}
 	
 	private void makeCompPart1(Shell shell, Display display) {
@@ -146,6 +149,13 @@ public class GameScreen extends Screen {
 	private void makeCompChange(Display display, int mapID, int tankID) {
 		map = new GameMap(display, compositeGame, mapID);
 		
+		color1 = SWT.COLOR_DARK_GREEN;
+		color2 = SWT.COLOR_BLACK;
+		if (tankID == 2) {
+			color1 = SWT.COLOR_DARK_RED;
+			color2 = SWT.COLOR_GRAY;
+		}
+		
 		canvas.addPaintListener(event -> {
 			//Tank tank = cModel.getTank();
 			HashMap<Integer, Tank> tanks = cModel.getTanks();
@@ -158,9 +168,9 @@ public class GameScreen extends Screen {
 				transform.translate(-tank.getX() - (tank.width / 2), -tank.getY() - (tank.height / 2));
 				event.gc.setTransform(transform);
 				//event.gc.fillRectangle(canvas.getBounds());
-				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color1));
 				event.gc.fillRectangle(tank_body);
-				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color2));
 				event.gc.fillOval(tank.getX(), tank.getY()+(tank.width/2), tank.width, tank.width);
 				event.gc.setLineWidth(4);
 				event.gc.drawLine(tank.getX()+(tank.width/2), tank.getY()+(tank.width/2), tank.getX()+(tank.width/2), tank.getY()-15);
@@ -187,9 +197,9 @@ public class GameScreen extends Screen {
 	}
 	
 	@Override
-	protected Composite makeCompositeAndMap(Shell shell, Display display, int mapID) {
+	protected Composite makeCompositeAndMap(Shell shell, Display display, int mapID, int tankID) {
 		makeCompPart1(shell, display);
-		makeCompChange(display, mapID, 1);
+		makeCompChange(display, mapID, tankID);
 		makeCompPart2();
 		
 		return composite;

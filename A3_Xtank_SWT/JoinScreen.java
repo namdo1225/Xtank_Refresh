@@ -141,6 +141,8 @@ public class JoinScreen extends Screen {
 		compositeJoin.setEnabled(true);
 		compositeTank.setEnabled(false);
 		selectTank.setText("You can now click on the screen to the right.");
+		
+		cControl.setTankModel(tankID);
 	}
 	
 	private void joinServer() {

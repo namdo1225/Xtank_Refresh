@@ -72,4 +72,8 @@ public class ClientController {
 			return false;
 		return true;
 	}
+
+	public void setTankModel(int model) {
+		clientModel.setTankModel(model);
+	}
 }

@@ -126,9 +126,9 @@ public class XTankUI
 		shell.layout(true, true);
 	}
 	
-	public void recreateGameScreen(int mapID) {
+	public void recreateGameScreen(int mapID, int tankID) {
 		screens[3].getComposite().dispose();
 		screens[3] = new GameScreen(shell, display, clientControl, hostControl, clientModel, hostModel,
-				mapID);
+				mapID, tankID);
 	}
 }

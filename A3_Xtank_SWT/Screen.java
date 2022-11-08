@@ -23,8 +23,8 @@ public abstract class Screen {
 	}
 	
 	public Screen(Shell shell, Display display, ClientController cCon, HostController hCon,
-			ClientModel cMod, HostModel hMod, int mapID) {
-		composite = makeCompositeAndMap(shell, display, mapID);
+			ClientModel cMod, HostModel hMod, int mapID, int tankID) {
+		composite = makeCompositeAndMap(shell, display, mapID, tankID);
 		cControl = cCon;
 		hControl = hCon;
 		
@@ -34,7 +34,7 @@ public abstract class Screen {
 	
 	protected abstract Composite makeComposite(Shell shell, Display display);
 	
-	protected Composite makeCompositeAndMap(Shell shell, Display display, int mapID) {
+	protected Composite makeCompositeAndMap(Shell shell, Display display, int mapID, int tankID) {
 		return null;
 	}
 	
