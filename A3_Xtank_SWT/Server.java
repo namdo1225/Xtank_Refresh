@@ -86,6 +86,7 @@ public class Server
     			e.printStackTrace();
     		}
     	}
+    }
 
     protected static class BulletManager implements Runnable {
 

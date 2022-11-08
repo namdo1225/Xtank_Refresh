@@ -144,7 +144,7 @@ public class JoinScreen extends Screen {
 	}
 	
 	private void joinServer() {
-		if (validateInput())
+		if (validateInput()) {
 			try {
 				cControl.createSocket(iP.getText(), Integer.parseInt(port.getText()));
 				if (cModel.getSocket() != null && cModel.getSocket().isConnected())
@@ -152,6 +152,11 @@ public class JoinScreen extends Screen {
 				else
 					error.setText("The server did not respond.");
 			} catch (Exception e) {}
+			
+			compositeJoin.setEnabled(false);
+			compositeTank.setEnabled(true);
+			selectTank.setText("Continue");
+		}
 		else {
 			iP.setMessage("Enter IPv4 address: One of your input was invalid.");
 			iP.setText("");

@@ -147,7 +147,8 @@ public class GameScreen extends Screen {
 
 					cControl.writeOut(packet);
 					canvas.redraw();
-      }
+				}
+			}
 			public void keyReleased(KeyEvent e) {}
 		});
 
@@ -211,7 +212,7 @@ public class GameScreen extends Screen {
 		
 		canvas.setBounds(0, 0, 800, 500);
 		
-		canvas.addPaintListener(event -> {
+		canvas.addPaintListener(e -> {
 			//Tank tank = cModel.getTank();
 			HashMap<Integer, Tank> tanks = cModel.getTanks();
 			for (var key : tanks.keySet()) {
@@ -221,14 +222,14 @@ public class GameScreen extends Screen {
 				transform.translate(tank.getX() + (tank.width / 2), tank.getY() + (tank.height / 2));
 				transform.rotate(-(float)tank.getRotate() + 90.0f);
 				transform.translate(-tank.getX() - (tank.width / 2), -tank.getY() - (tank.height / 2));
-				event.gc.setTransform(transform);
+				e.gc.setTransform(transform);
 				//event.gc.fillRectangle(canvas.getBounds());
-				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-				event.gc.fillRectangle(tank_body);
-				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_BLACK));
-				event.gc.fillOval(tank.getX(), tank.getY()+(tank.width/2), tank.width, tank.width);
-				event.gc.setLineWidth(4);
-				event.gc.drawLine(tank.getX()+(tank.width/2), tank.getY()+(tank.width/2), tank.getX()+(tank.width/2), tank.getY()-15);
+				e.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+				e.gc.fillRectangle(tank_body);
+				e.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+				e.gc.fillOval(tank.getX(), tank.getY()+(tank.width/2), tank.width, tank.width);
+				e.gc.setLineWidth(4);
+				e.gc.drawLine(tank.getX()+(tank.width/2), tank.getY()+(tank.width/2), tank.getX()+(tank.width/2), tank.getY()-15);
 				//canvas.setBounds(tank.getX(), tank.getY(), 50, 100);
 				map.collision(tank.getX(), tank.getY(), tank.getX() + tank.height, tank.getY() + tank.height);
 			}
@@ -236,8 +237,8 @@ public class GameScreen extends Screen {
 			ArrayList<Bullet> bullets = cModel.getBullets();
 			for (var bullet : bullets) {
 				Rectangle bullet_body = new Rectangle((int)bullet.getX(), (int)bullet.getY(), Bullet.size, Bullet.size);
-				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-				event.gc.fillRectangle(bullet_body);
+				e.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+				e.gc.fillRectangle(bullet_body);
 			}
 		});
 		
@@ -275,7 +276,8 @@ public class GameScreen extends Screen {
 
 					cControl.writeOut(packet);
 					canvas.redraw();
-      }
+				}
+			}
 			public void keyReleased(KeyEvent e) {}
 		});
 
@@ -304,7 +306,7 @@ public class GameScreen extends Screen {
 		return composite;
 	}
 		
-	public void checkConnection() {
+	public boolean isConnected() {
 		if (!cControl.isConnected()) {
 			serverStatus.setText("Server\nCLOSED\nPlease\nQuit.");
 			serverStatus.setForeground(compositePlayer.getDisplay().getSystemColor(SWT.COLOR_RED));
