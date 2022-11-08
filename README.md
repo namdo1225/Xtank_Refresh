@@ -1,7 +1,7 @@
 # A3_Xtank
 
 Final branch for grading: main
-  - Please import A3_XTank/A3_XTank_SWT
+  - Please import A3_XTank/A3_Xtank_SWT
 
 AUTHORS
 
