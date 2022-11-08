@@ -108,8 +108,7 @@ public class Server
 						i--;
 						// remove bullet from clients
 						for (var client : sq) {
-							InputPacket bullet_update = new InputPacket(i, (int)bullets.get(i).getX(), (int)bullets.get(i).getY(),
-									0, true);
+							InputPacket bullet_update = new InputPacket(i + 1, 0, 0, 0, true);
 							bullet_update.is_bullet = true;
 							try {
 								client.writeObject(bullet_update);
@@ -205,10 +204,11 @@ public class Server
                 		tanks.get(input.id).moveForward(input.y * SPEED);
         			}
                 	if (input.shoot) {
+                		System.out.println("shoot");
                 		float x = (float) (tank.getX() + tank.getDirectionX() * 100);
                 		float y = (float) (tank.getY() + tank.getDirectionY() * 100);
                 		bullet_lock.lock();
-                		bullets.add(new Bullet(x, y, tank.getRotate(), 1));
+                		bullets.add(new Bullet(x, y, tank.getRotate(), 10));
                 		bullet_lock.unlock();
                 	}
                 	for (ObjectOutputStream o: sq)

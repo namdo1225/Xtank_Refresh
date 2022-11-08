@@ -110,6 +110,9 @@ public class GameScreen extends Screen {
 					case SWT.ARROW_RIGHT:
 						packet.x = 1;
 						break;
+					case SWT.SPACE:
+						packet.shoot = true;
+						break;
 					}
 					
 					//System.out.println("key " + e.character);
@@ -159,6 +162,13 @@ public class GameScreen extends Screen {
 		}
 		
 		canvas.addPaintListener(event -> {
+			// render bullets before transformation for tanks
+			ArrayList<Bullet> bullets = cModel.getBullets();
+			for (var bullet : bullets) {
+				Rectangle bullet_body = new Rectangle((int)bullet.getX(), (int)bullet.getY(), Bullet.size, Bullet.size);
+				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+				event.gc.fillRectangle(bullet_body);
+			}
 			//Tank tank = cModel.getTank();
 			HashMap<Integer, Tank> tanks = cModel.getTanks();
 			for (var key : tanks.keySet()) {
@@ -191,13 +201,6 @@ public class GameScreen extends Screen {
 				event.gc.setForeground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 				event.gc.drawText(String.valueOf(tank.getID()), tank.getX() + 10, tank.getY()+(tank.width/2));
 				map.collision(tank.getX(), tank.getY(), tank.getX() + tank.height, tank.getY() + tank.height);
-			}
-			
-			ArrayList<Bullet> bullets = cModel.getBullets();
-			for (var bullet : bullets) {
-				Rectangle bullet_body = new Rectangle((int)bullet.getX(), (int)bullet.getY(), Bullet.size, Bullet.size);
-				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-				event.gc.fillRectangle(bullet_body);
 			}
 		});
 		

@@ -163,7 +163,7 @@ public class ClientModel {
 						}
 						if (packet.is_bullet) {
 							// new bullet
-							if (packet.id > bullets.size()) {
+							if (packet.id >= bullets.size()) {
 								bullets.add(new Bullet(packet.x, packet.y, 0, 0));
 							}
 							// update bullet
