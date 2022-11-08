@@ -6,11 +6,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.net.InetAddress;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +20,7 @@ import java.util.Map;
  */
 public class Server 
 {
-	private static ArrayList<ObjectOutputStream> 	sq;
+	private static List<ObjectOutputStream> 		sq;
 	private static HashMap<Integer, Tank>			tanks;
 
 	private static ServerSocket						listener;
@@ -26,12 +28,15 @@ public class Server
 	private static GameMap							map;
 	
 	private static boolean							acceptConnection;
+	private static boolean							isAcceptingNew;
+	
+	//private static List<ExecutorService>			poolIOs;
 	
     public Server(int port, int mapNum) {
 		//System.out.println(InetAddress.getLocalHost());
-    	
+    	isAcceptingNew = true;
     	acceptConnection = true;
-		sq = new ArrayList<>();
+		sq = new ArrayList<ObjectOutputStream>();
 		tanks = new HashMap<Integer, Tank>();
 		map = new GameMap(mapNum);
         try
@@ -53,6 +58,24 @@ public class Server
     		i++;
     	}
     	return i;
+    }
+    
+    public void stopNewConnection() {
+    	//isAcceptingNew = false;
+    	acceptConnection = false;
+    	System.out.println("ferwe");
+    	
+    	if (pool != null) {
+
+    		pool.shutdownNow();
+    		try {
+    			pool.awaitTermination(100, TimeUnit.MICROSECONDS);
+    		} catch (InterruptedException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+    	}
+
     }
     
     protected static class XTankManager implements Runnable {
@@ -161,7 +184,7 @@ public class Server
         {
         	while (acceptConnection) {
                 try {
-                	
+ 
                     socket = listener.accept();
             		clients++;
 

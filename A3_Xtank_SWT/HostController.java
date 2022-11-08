@@ -20,6 +20,10 @@ public class HostController {
 		} catch (Exception e) {}
 	}
 
+	public void stopNewConnection() {
+		hostModel.stopNewConnection();
+	}
+	
 	public void closeServer() {
 		if (hostModel.getServer() != null)
 			hostModel.getServer().closeServer();

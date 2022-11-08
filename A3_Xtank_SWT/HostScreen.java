@@ -116,8 +116,9 @@ public class HostScreen extends Screen {
 				SelectionListener.widgetSelectedAdapter(e-> hostServer()));
 		
 		next = new Button(compositeNetwork, SWT.PUSH);
-		next.setText("Next");
-		next.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> validateInput()));
+		next.setEnabled(false);
+		next.setText("Next: Please click 'Update' first!");
+		next.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> startGame()));
 		
 		backServer = new Button(compositeNetwork, SWT.PUSH);
 		backServer.setText("Back");
@@ -136,10 +137,15 @@ public class HostScreen extends Screen {
 	}
 	
 	private void hostServer() {
-		if (validateInput())
+		if (validateInput()) {
 			try {
 				hControl.createServer(Integer.parseInt(port.getText()), mapID);
 			} catch (Exception e) {}
+		
+			next.setEnabled(true);
+			next.setText("Next");
+			update.setEnabled(false);
+		}
 		else {
 			port.setMessage("Enter port number: Your input was invalid.");
 			port.setText("");
@@ -160,11 +166,18 @@ public class HostScreen extends Screen {
 		numPlayers.setText("Number of players:\t" + hModel.getPlayer());
 	}
 
+	private void startGame() {
+		hControl.stopNewConnection();
+	}
+	
 	private void closeServer() {
 		hControl.updateScreen(Mode.MAIN);
 		hControl.closeServer();
 		compositeNetwork.setEnabled(false);
 		compositeMap.setEnabled(true);
 		selectMap.setText("Select Map");
+		next.setEnabled(false);
+		next.setText("Next: Please click 'Update' first!");
+		update.setEnabled(true);
 	}
 }

@@ -82,7 +82,6 @@ public class JoinScreen extends Screen {
 		if (validateInput())
 			try {
 				cControl.createSocket(iP.getText(), Integer.parseInt(port.getText()));
-				
 				if (cModel.getSocket() != null && cModel.getSocket().isConnected())
 					cControl.updateScreen(Mode.GAME);
 				else
