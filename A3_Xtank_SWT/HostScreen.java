@@ -70,12 +70,12 @@ public class HostScreen extends Screen {
 		guide = new Label(compositeMap, SWT.BALLOON);
 		guide.setText("'Update' create new server socket with the typed-in port number."
 				+ "\nYou cannot click 'Next' to start the game "
-				+ "unless 2 or more players are in.\nYour input is validated. "
-				+ "Program will crash if your number is out of int's bounds.\nYou cannot host AND play the game."
-				+ "\n\nWell-known port range: 1024-65,535\tLocalhost: 127.0.0.1\nYour (probably wrong) IP: "
+				+ "unless 2 or more players are in.\n"
+				+ "Program will crash if your number is out of int's bounds."
+				+ "\nWell-known port range: 1024-65,535\tLocalhost: 127.0.0.1\nYour (probably wrong) IP: "
 				+ address
-				+ "\n\nPick a map FIRST! You cannot change your selection once it is chosen:");
-		guide.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));
+				+ "\nPick maps and lives FIRST! You cannot change your selection once it is chosen:");
+		guide.setFont(new Font(display,"Times New Roman", 8, SWT.BOLD ));
 		guide.setAlignment(SWT.CENTER);
 		
 		mapGroup = new Group(compositeMap, SWT.NONE);
