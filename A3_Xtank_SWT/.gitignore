@@ -34,3 +34,5 @@
 /XTankUI2$1.class
 /Server$XTankConnection.class
 /GameMap.class
+/Bullet.class
+/Server$BulletManager.class

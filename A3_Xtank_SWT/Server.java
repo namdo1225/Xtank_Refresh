@@ -6,6 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.net.InetAddress;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -20,26 +22,34 @@ public class Server
 {
 	private static ArrayList<ObjectOutputStream> 	sq;
 	private static HashMap<Integer, Tank>			tanks;
+	private static ArrayList<Bullet>				bullets;
 
 	private static ServerSocket						listener;
 	private static ExecutorService					pool;
+	private static ExecutorService					bullet_thread;
+	private static Lock								bullet_lock;
 	private static GameMap							map;
 	
 	private static boolean							acceptConnection;
 	
     public Server(int port, int mapNum) {
 		//System.out.println(InetAddress.getLocalHost());
-    	
     	acceptConnection = true;
 		sq = new ArrayList<>();
 		tanks = new HashMap<Integer, Tank>();
+		bullets = new ArrayList<Bullet>();
 		map = new GameMap(mapNum);
+		Bullet.setMap(map);
         try
         {
         	listener = new ServerSocket(port);
             //System.out.println("The XTank server is running...");
-            pool = Executors.newFixedThreadPool(5);
+        	bullet_thread = Executors.newFixedThreadPool(1);
+        	bullet_lock = new ReentrantLock();
+            pool = Executors.newFixedThreadPool(4);
             pool.execute(new XTankConnection(listener));
+            bullet_thread.execute(new BulletManager());
+            
         } catch (Exception e) {}
     }
     
@@ -53,6 +63,52 @@ public class Server
     		i++;
     	}
     	return i;
+    }
+    
+    protected static class BulletManager implements Runnable {
+
+		@Override
+		public void run() {
+			while (true) {
+				bullet_lock.lock();
+				for (int i = 0; i < bullets.size(); i++) {
+					if (!bullets.get(i).step()) {
+						bullets.remove(i);
+						i--;
+						// remove bullet from clients
+						for (var client : sq) {
+							InputPacket bullet_update = new InputPacket(i, (int)bullets.get(i).getX(), (int)bullets.get(i).getY(),
+									0, true);
+							bullet_update.is_bullet = true;
+							try {
+								client.writeObject(bullet_update);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					else {
+						for (var client : sq) {
+							InputPacket bullet_update = new InputPacket(i, (int)bullets.get(i).getX(), (int)bullets.get(i).getY(),
+																		0, false);
+							bullet_update.is_bullet = true;
+							try {
+								client.writeObject(bullet_update);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+						System.out.println(i + " " + bullets.get(i).getX() + " " + bullets.get(i).getY());
+					}
+				}
+				bullet_lock.unlock();
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
     }
     
     protected static class XTankManager implements Runnable {
@@ -106,7 +162,8 @@ public class Server
                 	InputPacket input = (InputPacket)in.readObject();
                 	// update tank position server side
                 	final int SPEED = 5;
-                	tanks.get(input.id).rotate(-input.x * SPEED);
+                	Tank tank = tanks.get(input.id);
+                	tank.rotate(-input.x * SPEED);
                 	//System.out.println(tanks.get(input.id).getRotate());
                 	tanks.get(input.id).moveForward(-input.y * SPEED);
                 	if (map.collision(tanks.get(input.id).getX(),
@@ -116,6 +173,13 @@ public class Server
         			{
                 		tanks.get(input.id).moveForward(input.y * SPEED);
         			}
+                	if (input.shoot) {
+                		float x = (float) (tank.getX() + tank.getDirectionX() * 100);
+                		float y = (float) (tank.getY() + tank.getDirectionY() * 100);
+                		bullet_lock.lock();
+                		bullets.add(new Bullet(x, y, tank.getRotate(), 1));
+                		bullet_lock.unlock();
+                	}
                 	for (ObjectOutputStream o: sq)
                 	{
                     	InputPacket to_client = new InputPacket(input.id, 

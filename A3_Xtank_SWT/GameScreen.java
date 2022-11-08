@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.swt.SWT;
@@ -98,6 +99,13 @@ public class GameScreen extends Screen {
 				//canvas.setBounds(tank.getX(), tank.getY(), 50, 100);
 				map.collision(tank.getX(), tank.getY(), tank.getX() + tank.height, tank.getY() + tank.height);
 			}
+			
+			ArrayList<Bullet> bullets = cModel.getBullets();
+			for (var bullet : bullets) {
+				Rectangle bullet_body = new Rectangle((int)bullet.getX(), (int)bullet.getY(), Bullet.size, Bullet.size);
+				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+				event.gc.fillRectangle(bullet_body);
+			}
 		});
 		
 		canvas.addMouseListener(new MouseListener() {
@@ -123,6 +131,9 @@ public class GameScreen extends Screen {
 					break;
 				case 'd':
 					packet.x = 1;
+					break;
+				case ' ':
+					packet.shoot = true;
 					break;
 				}
 				//System.out.println("key " + e.character);

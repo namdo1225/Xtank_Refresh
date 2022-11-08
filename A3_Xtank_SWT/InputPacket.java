@@ -9,6 +9,7 @@ public class InputPacket implements java.io.Serializable {
 		this.y = y;
 		this.angle = angle;
 		this.shoot = shoot;
+		this.is_bullet = false;
 	}
 	private static final long serialVersionUID = 1L;
 	public int id;
@@ -16,7 +17,7 @@ public class InputPacket implements java.io.Serializable {
 	public int y;
 	public int angle;
 	public boolean shoot;
-	public boolean add_player;
+	public boolean is_bullet;
 }
 
 class IntPacket {
