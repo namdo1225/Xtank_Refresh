@@ -54,7 +54,7 @@ public class ClientModel {
         		int map_id = (Integer)in.readObject();
         		// Somehow change GameMap here
         		
-        		
+        		clientView.recreateGameScreen(map_id);
         		
         		new_tank = (InputPacket)in.readObject();
         		int num_tanks = (Integer)in.readObject();
