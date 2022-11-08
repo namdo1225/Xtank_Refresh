@@ -40,9 +40,7 @@ public class GameScreen extends Screen {
 	
 	private	int				color1;
 	private int				color2;
-	
-	private int				tankID;
-	
+		
 	public GameScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
 		super(shell, display, cCon, hCon, cMod, hMod);
@@ -97,7 +95,7 @@ public class GameScreen extends Screen {
 		canvas.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
 				if (isConnected()) {
-
+					int tankID = cModel.getTank().getID();
 					InputPacket packet = new InputPacket(tankID);
 					switch (e.keyCode) {
 					case SWT.ARROW_UP:
@@ -204,7 +202,6 @@ public class GameScreen extends Screen {
 		});
 		
 		plHeader.setText("You are\nplayer:\n" + tankID);
-		this.tankID = tankID;
 	}
 	
 	@Override
