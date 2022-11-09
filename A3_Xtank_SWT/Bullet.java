@@ -37,7 +37,7 @@ public class Bullet {
 	public boolean step() {
 		if (map != null) {
 			x += getDirectionX() * speed;
-			y += getDirectionX() * speed;
+			y -= getDirectionY() * speed;
 			// hit a wall
 			if (map.collision((int)x, (int)y, (int)x + size, (int)y + size)) {
 				return false;

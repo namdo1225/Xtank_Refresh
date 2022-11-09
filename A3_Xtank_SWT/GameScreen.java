@@ -4,6 +4,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -40,6 +42,9 @@ public class GameScreen extends Screen {
 	
 	private	int				color1;
 	private int				color2;
+	
+	private Runner			runner;
+	private	ExecutorService	redrawThread;
 		
 	public GameScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
@@ -220,6 +225,10 @@ public class GameScreen extends Screen {
 	protected Composite makeCompositeAndMap(Shell shell, Display display, 
 			int mapID, int tankModel, int tankID) {
 		makeCompPart1(shell, display);
+		
+       	redrawThread = Executors.newFixedThreadPool(1);
+       	redrawThread.execute(new Runner());
+		
 		makeCompChange(display, mapID, tankModel, tankID);
 		makeCompPart2();
 		
@@ -242,5 +251,26 @@ public class GameScreen extends Screen {
 		serverStatus.setForeground(compositePlayer.getDisplay().getSystemColor(SWT.COLOR_GREEN));
 		cControl.endGame();
 		cControl.updateScreen(Mode.MAIN);
+	}
+	
+	public class Runner implements Runnable {
+		@Override
+		public void run() {
+			while (!canvas.isDisposed()) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+			
+            	if (!canvas.isDisposed())
+				canvas.getDisplay().asyncExec(new Runnable() {
+		            public void run() {
+		            	if (!canvas.isDisposed())
+		            		canvas.redraw();
+		            }
+		        });
+			}
+		}
 	}
 }

@@ -205,8 +205,8 @@ public class Server
         			}
                 	if (input.shoot) {
                 		System.out.println("shoot");
-                		float x = (float) (tank.getX() + tank.getDirectionX() * 100);
-                		float y = (float) (tank.getY() + tank.getDirectionY() * 100);
+                		float x = (float) (tank.getX() + (tank.width / 2) + tank.getDirectionX() * 50);
+                		float y = (float) (tank.getY() + (tank.height / 2) - tank.getDirectionY() * 50);
                 		bullet_lock.lock();
                 		bullets.add(new Bullet(x, y, tank.getRotate(), 10));
                 		bullet_lock.unlock();

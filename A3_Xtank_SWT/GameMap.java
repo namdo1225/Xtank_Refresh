@@ -89,7 +89,7 @@ public class GameMap {
 		}
 		// outside bounds
 		if (x1 < 0 || x2 > 800 || y1 < 0 || y2 > 800) {
-			return true;
+			//return true;
 		}
 		
 		return false;
