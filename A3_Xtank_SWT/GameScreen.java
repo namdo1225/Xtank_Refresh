@@ -1,9 +1,15 @@
-import java.awt.Color;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
+/**
+ * A class to represent the UI portion of the actual gameplay screen.
+ * 
+ * For the parent class, @see Screen.java
+ * 
+ * @author	Nam Do
+ * @version	1.0
+ * @since	2022-11-12
+ */
+
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,7 +31,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 public class GameScreen extends Screen {
 	private Composite 		compositePlayer;
@@ -43,19 +48,47 @@ public class GameScreen extends Screen {
 	private	int				color1;
 	private int				color2;
 	
-	private Runner			runner;
 	private	ExecutorService	redrawThread;
-		
+
+	/**
+	 * A constructor for GameScreen. Specifically for the server/host.
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 * @param cCon		a ClientController for the controller of the client.
+	 * @param hCon		a HostController for the controller of the host.
+	 * @param cMod		a ClientModel for the model of the client.
+	 * @param hMod		a HostModel for the model of the host.
+	 */
 	public GameScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
 		super(shell, display, cCon, hCon, cMod, hMod);
 	}
 	
+	/**
+	 * A constructor for GameScreen. Specifically for the client.
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 * @param cCon		a ClientController for the controller of the client.
+	 * @param hCon		a HostController for the controller of the host.
+	 * @param cMod		a ClientModel for the model of the client.
+	 * @param hMod		a HostModel for the model of the host.
+	 * @param mapID		an int for the map's id.
+	 * @param tankModel	an int for the model of the tank.
+	 * @param tankID	an int for the tank's id.
+	 */
 	public GameScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod, int mapID, int tankModel, int tankID) {
 		super(shell, display, cCon, hCon, cMod, hMod, mapID, tankModel, tankID);
 	}
 	
+	/**
+	 * A method that construct parts of the UI for this screen. No. 1
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 */
 	private void makeCompPart1(Shell shell, Display display) {
 		composite = new Composite(shell, SWT.COLOR_WHITE);
 		
@@ -72,22 +105,23 @@ public class GameScreen extends Screen {
 		serverStatus.setFont(new Font(display,"Times New Roman", 12, SWT.BOLD ));
 		serverStatus.setAlignment(SWT.LEFT);
 		serverStatus.setForeground(display.getSystemColor(SWT.COLOR_GREEN));
-
 		
 		quit = new Button(compositePlayer, SWT.PUSH);
 		quit.setText("Quit");
 		quit.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> endGame()));
 		
 		compositeGame = new Composite(composite, SWT.COLOR_BLACK);
-		//compositeGame.setLayout(new FillLayout(SWT.VERTICAL));
-		//compositeGame.setBackground(display.getSystemColor(SWT.COLOR_WHITE));
 		compositeGame.setBackgroundMode(SWT.INHERIT_FORCE);
+		
 		composite.setBackgroundMode(SWT.INHERIT_FORCE);
 
 		canvas = new Canvas(compositeGame, SWT.TRANSPARENT);
 		canvas.setBounds(0, 0, 800, 500);
 	}
 	
+	/**
+	 * A method that construct parts of the UI for this screen. No. 2
+	 */
 	private void makeCompPart2() {
 		canvas.addMouseListener(new MouseListener() {
 			public void mouseDown(MouseEvent e) {
@@ -155,7 +189,14 @@ public class GameScreen extends Screen {
 		composite.setLayout(layout);
 	}
 	
-	
+	/**
+	 * A method to construct parts of the UI that depends on the client/server.
+	 * 
+	 * @param display	a Display from SWT to help use the graphic library.
+	 * @param mapID		an int for the map's id.
+	 * @param tankModel	an int for the model of the tank.
+	 * @param tankID	an int for the tank's id.
+	 */
 	private void makeCompChange(Display display, int mapID, int tankModel, int tankID) {
 		map = new GameMap(display, compositeGame, mapID);
 		
@@ -168,14 +209,14 @@ public class GameScreen extends Screen {
 		
 		canvas.addPaintListener(event -> {
 			// render bullets before transformation for tanks
-			ArrayList<Bullet> bullets = cModel.getBullets();
+			List<Bullet> bullets = cModel.getBullets();
 			for (var bullet : bullets) {
 				Rectangle bullet_body = new Rectangle((int)bullet.getX(), (int)bullet.getY(), Bullet.size, Bullet.size);
 				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
 				event.gc.fillRectangle(bullet_body);
 			}
 			//Tank tank = cModel.getTank();
-			HashMap<Integer, Tank> tanks = cModel.getTanks();
+			Map<Integer, Tank> tanks = cModel.getTanks();
 			for (var key : tanks.keySet()) {
 				
 				// get tank info
@@ -212,6 +253,14 @@ public class GameScreen extends Screen {
 		plHeader.setText("You are\nplayer:\n" + tankID);
 	}
 	
+	/**
+	 * A method to make the entire UI for this screen.
+	 * 
+	 * @see Screen.java
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 */
 	@Override
 	protected Composite makeComposite(Shell shell, Display display) {
 		makeCompPart1(shell, display);
@@ -221,20 +270,37 @@ public class GameScreen extends Screen {
 		return composite;
 	}
 	
+	/**
+	 * A method to make the entire UI for this screen with data based on client
+	 * and server.
+	 * 
+	 * @see Screen.java
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 * @param mapID		an int for the map's id.
+	 * @param tankModel	an int for the model of the tank.
+	 * @param tankID	an int for the tank's id.
+	 */
 	@Override
 	protected Composite makeCompositeAndMap(Shell shell, Display display, 
 			int mapID, int tankModel, int tankID) {
 		makeCompPart1(shell, display);
 		
        	redrawThread = Executors.newFixedThreadPool(1);
-       	redrawThread.execute(new Runner());
+       	redrawThread.execute(new CanvasUpdater());
 		
 		makeCompChange(display, mapID, tankModel, tankID);
 		makeCompPart2();
 		
 		return composite;
 	}
-		
+
+	/**
+	 * A method to check if the model is still connected to the server.
+	 * 
+	 * @return	a boolean. true if model is still connected to server. false if not.
+	 */
 	public boolean isConnected() {
 		if (!cControl.isConnected()) {
 			serverStatus.setText("Server\nCLOSED\nPlease\nQuit.");
@@ -246,6 +312,9 @@ public class GameScreen extends Screen {
 		return true;
 	}
 	
+	/**
+	 * A method to end the game, cleaning up the UI and returning to the title screen.
+	 */
 	public void endGame() {
 		serverStatus.setText("Server\nACTIVE");
 		serverStatus.setForeground(compositePlayer.getDisplay().getSystemColor(SWT.COLOR_GREEN));
@@ -253,7 +322,19 @@ public class GameScreen extends Screen {
 		cControl.updateScreen(Mode.MAIN);
 	}
 	
-	public class Runner implements Runnable {
+	/**
+	 * A Runnable derived class that represents the task of
+	 * updating the canvas for the UI.
+	 * 
+	 * @author	Nam Do
+	 * @version	1.0
+	 * @since	2022-11-12
+	 */
+	private class CanvasUpdater implements Runnable {
+		
+		/**
+		 * A method to run the task, which updates the canvas.
+		 */
 		@Override
 		public void run() {
 			while (!canvas.isDisposed()) {

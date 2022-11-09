@@ -28,21 +28,15 @@ public class Server
 
 	private static ServerSocket						listener;
 	private static ExecutorService					pool;
-	private static ExecutorService					closeThread;
 	
 	private static ExecutorService					bullet_thread;
 	private static Lock								bullet_lock;
 	private static GameMap							map;
 	
-	private static boolean							acceptConnection;
-	private static boolean							isAcceptingNew;
-	
 	//private static List<ExecutorService>			poolIOs;
 	
     public Server(int port, int mapNum) {
 		//System.out.println(InetAddress.getLocalHost());
-    	isAcceptingNew = true;
-    	acceptConnection = true;
 		sq = new ArrayList<ObjectOutputStream>();
 		tanks = new HashMap<Integer, Tank>();
 		bullets = new ArrayList<Bullet>();
@@ -71,29 +65,6 @@ public class Server
     		i++;
     	}
     	return i;
-    }
-    
-    public void stopNewConnection() {
-    	isAcceptingNew = false;
-    	acceptConnection = false;
-    	
-    	if (acceptConnection) {
-    	
-    		if (pool != null) {
-
-    			pool.shutdownNow();
-    			try {
-    				pool.awaitTermination(100, TimeUnit.MICROSECONDS);
-    				System.out.println(pool.isShutdown() + " " + pool.isTerminated());
-    			} catch (InterruptedException e) {
-    				// TODO Auto-generated catch block
-    				e.printStackTrace();
-    			}
-    		}
-
-    		closeThread = Executors.newFixedThreadPool(1);
-    		closeThread.execute(new XTankClose());
-    	}
     }
 
     protected static class BulletManager implements Runnable {
@@ -250,32 +221,15 @@ public class Server
         @Override
         public void run() 
         {
-        	while (acceptConnection) {
+        	while (true) {
                 try {
-                	if (isAcceptingNew)
-                		socket = listener.accept();
-                	
-                	if (!isAcceptingNew)
-                		if (socket != null)
-                			socket.close();
-                	
-                	if (isAcceptingNew) {
+                	socket = listener.accept();
             		clients++;
 
             		ExecutorService poolTest = Executors.newFixedThreadPool(5);
             		poolTest.execute(new XTankManager(socket, this));
-                	}
-                } catch (IOException e) {
-                	acceptConnection = false;
-                }
+                } catch (IOException e) {}
         	}
-        	
-        	if (!acceptConnection)
-        		if (socket != null)
-					try {
-						socket.close();
-					} catch (IOException e) {
-					}
         }
 
         public static int getPlCount() {
@@ -287,26 +241,7 @@ public class Server
         }
     }
 
-    protected static class XTankClose implements Runnable {
-        private Socket					socket;
-
-        @Override
-        public void run() 
-        {
-        	while (true) {
-                try {
-                	socket = listener.accept();
-                	if (socket != null)
-                		socket.close();
-                } catch (IOException e) {}
-        	}
-
-        }
-    }
-    
     public void closeServer() {
-    	acceptConnection = false;
-    	
     	try {
         	if (listener != null)
         		listener.close();
@@ -314,9 +249,6 @@ public class Server
     	
     	if (pool != null)
     		pool.shutdownNow();
-    	
-    	if (closeThread != null)
-    		closeThread.shutdownNow();
     }
 }
 

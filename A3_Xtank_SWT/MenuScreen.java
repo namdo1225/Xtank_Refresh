@@ -11,10 +11,13 @@ import org.eclipse.swt.widgets.Shell;
 public class MenuScreen extends Screen {
 	private Label		title;
 	
+	private Label		winner;
+	
 	private Button		mainJoin;
 	private Button		mainHost;
 	private Button		mainExit;
-
+	private Button		updateWinner;
+	
 	public MenuScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
 		super(shell, display, cCon, hCon, cMod, hMod);
@@ -43,6 +46,16 @@ public class MenuScreen extends Screen {
 		mainExit.addSelectionListener(
 				SelectionListener.widgetSelectedAdapter(e-> System.exit(0)));
 
+		updateWinner = new Button(composite, SWT.PUSH);
+		updateWinner.setText("Update Winner");
+		updateWinner.addSelectionListener(
+				SelectionListener.widgetSelectedAdapter(e-> System.out.println(0)));
+		
+		winner = new Label(composite, SWT.BALLOON);
+		winner.setText("No winner");
+		winner.setFont(new Font(display,"Times New Roman", 14, SWT.BOLD ));
+		winner.setAlignment(SWT.CENTER);
+		
 		composite.setLayout(new FillLayout(SWT.VERTICAL));
 		
 		return composite;

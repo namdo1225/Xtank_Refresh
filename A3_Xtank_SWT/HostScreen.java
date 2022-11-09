@@ -23,7 +23,6 @@ public class HostScreen extends Screen {
 	private Text		port;
 	
 	private Button		update;
-	private Button		next;
 	private Button		backServer;
 	private Button		updatePlayer;
 	
@@ -69,9 +68,7 @@ public class HostScreen extends Screen {
 		
 		guide = new Label(compositeMap, SWT.BALLOON);
 		guide.setText("'Update' create new server socket with the typed-in port number."
-				+ "\nYou cannot click 'Next' to start the game "
-				+ "unless 2 or more players are in.\n"
-				+ "Program will crash if your number is out of int's bounds."
+				+ "\nProgram will crash if your number is out of int's bounds."
 				+ "\nWell-known port range: 1024-65,535\tLocalhost: 127.0.0.1\nYour (probably wrong) IP: "
 				+ address
 				+ "\nPick maps and lives FIRST! You cannot change your selection once it is chosen:");
@@ -138,11 +135,6 @@ public class HostScreen extends Screen {
 		update.addSelectionListener(
 				SelectionListener.widgetSelectedAdapter(e-> hostServer()));
 		
-		next = new Button(compositeNetwork, SWT.PUSH);
-		next.setEnabled(false);
-		next.setText("Next: Please click 'Update' first!");
-		next.addSelectionListener(SelectionListener.widgetSelectedAdapter(e-> startGame()));
-		
 		backServer = new Button(compositeNetwork, SWT.PUSH);
 		backServer.setText("Back");
 		backServer.addSelectionListener(
@@ -165,8 +157,6 @@ public class HostScreen extends Screen {
 				hControl.createServer(Integer.parseInt(port.getText()), mapID);
 			} catch (Exception e) {}
 		
-			next.setEnabled(true);
-			next.setText("Next");
 			update.setEnabled(false);
 		}
 		else {
@@ -188,10 +178,6 @@ public class HostScreen extends Screen {
 	private void updatePlCount() {
 		numPlayers.setText("Number of players:\t" + hModel.getPlayer());
 	}
-
-	private void startGame() {
-		hControl.stopNewConnection();
-	}
 	
 	private void closeServer() {
 		hControl.updateScreen(Mode.MAIN);
@@ -199,8 +185,6 @@ public class HostScreen extends Screen {
 		compositeNetwork.setEnabled(false);
 		compositeMap.setEnabled(true);
 		selectMap.setText("Continue");
-		next.setEnabled(false);
-		next.setText("Next: Please click 'Update' first!");
 		update.setEnabled(true);
 	}
 }

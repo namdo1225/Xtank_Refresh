@@ -38,10 +38,6 @@ public class HostModel {
 		return server;
 	}
 	
-	public void stopNewConnection() {
-		server.stopNewConnection();
-	}
-	
 	public void deleteServer() {
 		server = null;
 	}
