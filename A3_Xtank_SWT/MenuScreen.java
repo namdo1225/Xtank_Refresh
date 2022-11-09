@@ -1,3 +1,13 @@
+/**
+ * A class to represent the UI portion of the title screen.
+ * 
+ * For the parent class, @see Screen.java
+ * 
+ * @author	Nam Do
+ * @version	1.0
+ * @since	2022-11-12
+ */
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
@@ -10,7 +20,6 @@ import org.eclipse.swt.widgets.Shell;
 
 public class MenuScreen extends Screen {
 	private Label		title;
-	
 	private Label		winner;
 	
 	private Button		mainJoin;
@@ -18,11 +27,29 @@ public class MenuScreen extends Screen {
 	private Button		mainExit;
 	private Button		updateWinner;
 	
+	/**
+	 * A constructor for MenuScreen.
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 * @param cCon		a ClientController for the controller of the client.
+	 * @param hCon		a HostController for the controller of the host.
+	 * @param cMod		a ClientModel for the model of the client.
+	 * @param hMod		a HostModel for the model of the host.
+	 */
 	public MenuScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
 		super(shell, display, cCon, hCon, cMod, hMod);
 	}
 
+	/**
+	 * A method to make the entire UI for this screen.
+	 * 
+	 * @see Screen.java
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 */
 	protected Composite makeComposite(Shell shell, Display display) {
 		composite = new Composite(shell, SWT.COLOR_WHITE);
 		

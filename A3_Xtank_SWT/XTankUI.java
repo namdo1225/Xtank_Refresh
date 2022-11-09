@@ -1,23 +1,19 @@
+/**
+ * A class that represents the entire UI and the view of the MVC.
+ * 
+ * Pattern: the view of the MVC.
+ * 
+ * @author	Nam Do
+ * @version	1.0
+ * @since	2022-11-12
+ */
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.layout.*;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
-public class XTankUI
-{
+public class XTankUI {
 	private static XTankUI			ui;
 	private Display					display;
 	private Shell					shell;
@@ -33,12 +29,20 @@ public class XTankUI
 
 	private GridLayout				layout;
 	
+	/**
+	 * A getter to get the singular XTankUI object.
+	 * 
+	 * @return	a XTankUI object.
+	 */
 	public synchronized static XTankUI get() {
 		if (ui == null)
 			ui = new XTankUI();
 		return ui;
 	}
-		
+
+	/**
+	 * A method to start the UI and create appropriate SWT objects.
+	 */
 	public void start() {
 		display = new Display();
 		shell = new Shell(display);
@@ -58,7 +62,6 @@ public class XTankUI
 					clientControl.stopRunnable();
 						
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				shell.dispose();
@@ -100,16 +103,36 @@ public class XTankUI
 		
 	}
 	
+	/**
+	 * A method to set the client controller and model so the UI would have a
+	 * reference to it.
+	 * 
+	 * @param model		a ClientModel for the client model of the MVC.
+	 * @param control	a ClientController for the client controller of the MVC.
+	 */
 	public void setClientMVC(ClientModel model, ClientController control) {
 		clientModel = model;
 		clientControl = control;
 	}
 	
+	/**
+	 * A method to set the server controller and model so the UI would have a
+	 * reference to it.
+	 * 
+	 * @param model		a HostModel for the server model of the MVC.
+	 * @param control	a HostController for the server controller of the MVC.
+	 */
 	public void setHostMVC(HostModel model, HostController control) {
 		hostModel = model;
 		hostControl = control;
 	}
 	
+	/**
+	 * A method to update the UI to the appropriate menu screen.
+	 * 
+	 * @param mode		a Mode enum that will have data about what menu screen
+	 * 					that will be visible.
+	 */
 	public void updateScreen(Mode mode) {		
 		for (int i = 0; i < screens.length; i++) {
 			if (i == mode.ordinal()) {
@@ -126,6 +149,13 @@ public class XTankUI
 		shell.layout(true, true);
 	}
 	
+	/**
+	 * A method to recreate the GameScreen object with personalized client data.
+	 * 
+	 * @param mapID		an int for the map's id.
+	 * @param tankModel	an int for the model of the tank.
+	 * @param tankID	an int for the tank's id.
+	 */
 	public void recreateGameScreen(int mapID, int tankModel, int tankID) {
 		screens[3].getComposite().dispose();
 		screens[3] = new GameScreen(shell, display, clientControl, hostControl, clientModel, hostModel,

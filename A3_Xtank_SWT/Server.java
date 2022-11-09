@@ -1,3 +1,11 @@
+/**
+ * A class to represent the server itself with hosting capability
+ * and threading to accompany it.
+ * 
+ * @author	Patrick Comden
+ * @version	1.0
+ * @since	2022-11-12
+ */
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -6,25 +14,18 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.net.InetAddress;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * When a client connects, a new thread is started to handle it.
- */
 public class Server 
 {
 	private static List<ObjectOutputStream> 		sq;
-	private static HashMap<Integer, Tank>			tanks;
-	private static ArrayList<Bullet>				bullets;
+	private static Map<Integer, Tank>				tanks;
+	private static List<Bullet>						bullets;
 
 	private static ServerSocket						listener;
 	private static ExecutorService					pool;
@@ -33,8 +34,12 @@ public class Server
 	private static Lock								bullet_lock;
 	private static GameMap							map;
 	
-	//private static List<ExecutorService>			poolIOs;
-	
+	/**
+	 * Constructor for Server.
+	 * 
+	 * @param port		an int for the port number.
+	 * @param mapNum	an int for the maze map's id.
+	 */
     public Server(int port, int mapNum) {
 		//System.out.println(InetAddress.getLocalHost());
 		sq = new ArrayList<ObjectOutputStream>();
@@ -55,10 +60,20 @@ public class Server
         } catch (Exception e) {}
     }
     
+    /**
+     * A getter to get the players count.
+     * 
+     * @return	an int for the players count.
+     */
     public int getPlCount() {
     	return XTankConnection.getPlCount();
     }
     
+    /**
+     * A method to return a new id to assign to a new tank.
+     * 
+     * @return	an int for the new id of the new tank.
+     */
     public static int getNewID() {
     	int i = 0;
     	while (tanks.containsKey(i)) {
@@ -67,8 +82,32 @@ public class Server
     	return i;
     }
 
-    protected static class BulletManager implements Runnable {
-
+    /**
+     * A method to close the server socket and the threading related
+     * to the server's task.
+     */
+    public void closeServer() {
+    	try {
+        	if (listener != null)
+        		listener.close();
+		} catch (IOException e) {}
+    	
+    	if (pool != null)
+    		pool.shutdownNow();
+    }
+    
+    /**
+     * A Runnable-derived class to represent the task of managing bullets
+     * for the server.
+     * 
+     * @author	Patrick Comden
+     * @version	1.0
+     * @since	2022-11-12
+     */
+    private static class BulletManager implements Runnable {
+    	/**
+    	 * A method to run the tasks, which manages bullets for the server.
+    	 */
 		@Override
 		public void run() {
 			while (true) {
@@ -112,15 +151,31 @@ public class Server
 		}
     }
     
-    protected static class XTankManager implements Runnable {
+    /**
+     * A Runnable-derived class to represent the task of managing tanks,
+     * their input from the clients, and their output to the clients to maintain
+     * game flow.
+     * 
+     * @author	Patrick Comden
+     * @version	1.0
+     * @since	2022-11-12
+     */
+    private static class XTankManager implements Runnable {
         private Socket					socket;
-        private static XTankConnection	connector;
         
-        public XTankManager(Socket soc, XTankConnection connection) {
+        /**
+         * Constructor for XTankManager.
+         * 
+         * @param soc		a Socket representing the player's connection.
+         */
+        public XTankManager(Socket soc) {
         	socket = soc;
-        	connector = connection;
         }
 
+        /**
+         * A method to run the task, which is managing the tanks, clients' inputs,
+         * and server's outputs to maintain game flow.
+         */
         @Override
         public void run() 
         {
@@ -210,14 +265,28 @@ public class Server
         }
     }
     
-    protected static class XTankConnection implements Runnable {
+    /**
+     * A Runnable-derived class to represent the task of accepting new connections
+     * for the server.
+     * 
+     * @author	Patrick Comden
+     * @version	1.0
+     * @since	2022-11-12
+     */
+    private static class XTankConnection implements Runnable {
         private Socket					socket;
         private static int				clients;
         
+        /**
+         * Constructor for XTankConnection.
+         */
         public XTankConnection() {
         	clients = 0;
         }
 
+        /**
+         * A method to run the task, which keeps accepting new player connections.
+         */
         @Override
         public void run() 
         {
@@ -227,28 +296,29 @@ public class Server
             		clients++;
 
             		ExecutorService poolTest = Executors.newFixedThreadPool(5);
-            		poolTest.execute(new XTankManager(socket, this));
+            		poolTest.execute(new XTankManager(socket));
                 } catch (IOException e) {}
         	}
         }
 
+        /**
+         * A getter to return the number of clients connected to the server.
+         * 
+         * @return	an int for the number of clients.
+         */
         public static int getPlCount() {
         	return clients;
         }
         
+        /**
+         * A setter for the number of clients connected to the server.
+         * 
+         * @param players	an int for the number of clients to be updated
+         * 					in the server.
+         */
         public static void setPlCount(int players) {
         	clients = players;
         }
-    }
-
-    public void closeServer() {
-    	try {
-        	if (listener != null)
-        		listener.close();
-		} catch (IOException e) {}
-    	
-    	if (pool != null)
-    		pool.shutdownNow();
     }
 }
 

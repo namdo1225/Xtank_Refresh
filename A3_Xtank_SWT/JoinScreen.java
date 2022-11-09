@@ -1,14 +1,19 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+/**
+ * A class to represent the UI portion of the screen to
+ * that allows the player to join a server.
+ * 
+ * For the parent class, @see Screen.java
+ * 
+ * @author	Nam Do
+ * @version	1.0
+ * @since	2022-11-12
+ */
+
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
@@ -44,11 +49,29 @@ public class JoinScreen extends Screen {
 	
 	private int			tankID;
 	
+	/**
+	 * A constructor for JoinScreen.
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 * @param cCon		a ClientController for the controller of the client.
+	 * @param hCon		a HostController for the controller of the host.
+	 * @param cMod		a ClientModel for the model of the client.
+	 * @param hMod		a HostModel for the model of the host.
+	 */
 	public JoinScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
 		super(shell, display, cCon, hCon, cMod, hMod);
 	}
 	
+	/**
+	 * A method to make the entire UI for this screen.
+	 * 
+	 * @see Screen.java
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 */
 	protected Composite makeComposite(Shell shell, Display display) {
 		composite = new Composite(shell, SWT.COLOR_WHITE);
 		
@@ -130,6 +153,9 @@ public class JoinScreen extends Screen {
 		return composite;
 	}
 	
+	/**
+	 * A method to go back to the previous screen and update the UI.
+	 */
 	private void goBack() {
 		compositeJoin.setEnabled(false);
 		compositeTank.setEnabled(true);
@@ -137,6 +163,9 @@ public class JoinScreen extends Screen {
 		cControl.updateScreen(Mode.MAIN);
 	}
 	
+	/**
+	 * A method to confirm the player's selection of the tank model.
+	 */
 	private void tankSelected() {
 		compositeJoin.setEnabled(true);
 		compositeTank.setEnabled(false);
@@ -145,6 +174,9 @@ public class JoinScreen extends Screen {
 		cControl.setTankModel(tankID);
 	}
 	
+	/**
+	 * A method to have the controller join to the server and update the UI.
+	 */
 	private void joinServer() {
 		if (validateInput()) {
 			try {
@@ -169,6 +201,13 @@ public class JoinScreen extends Screen {
 		}
 	}
 	
+	/**
+	 * A method to validate the user's inputs, specifically the IP address
+	 * and port number.
+	 * 
+	 * @return	a boolean. true if IP address and port number are valid.
+	 * 			false if not.
+	 */
 	private boolean validateInput() {
 		String[] fourHex = iP.getText().split("\\.");
 		

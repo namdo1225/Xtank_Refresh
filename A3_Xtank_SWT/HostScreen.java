@@ -1,3 +1,13 @@
+/**
+ * A class to represent the UI portion of a screen to host a server.
+ *
+ * For the parent class, @see Screen.java
+ * 
+ * @author	Nam Do
+ * @version	1.0
+ * @since	2022-11-12
+ */
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -44,6 +54,16 @@ public class HostScreen extends Screen {
 	private int			mapID;
 	private int			maxLives;
 	
+	/**
+	 * A constructor for HostScreen.
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 * @param cCon		a ClientController for the controller of the client.
+	 * @param hCon		a HostController for the controller of the host.
+	 * @param cMod		a ClientModel for the model of the client.
+	 * @param hMod		a HostModel for the model of the host.
+	 */
 	public HostScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
 		super(shell, display, cCon, hCon, cMod, hMod);
@@ -51,6 +71,14 @@ public class HostScreen extends Screen {
 		mapID = 1;
 	}
 	
+	/**
+	 * A method to make the entire UI for this screen.
+	 * 
+	 * @see Screen.java
+	 * 
+	 * @param shell		a Shell from SWT to help use the graphic library.
+	 * @param display	a Display from SWT to help use the graphic library.
+	 */
 	@Override
 	protected Composite makeComposite(Shell shell, Display display) {
 		composite = new Composite(shell, SWT.COLOR_WHITE);
@@ -145,12 +173,19 @@ public class HostScreen extends Screen {
 		return composite;
 	}
 
+	/**
+	 * A method to set the UI so that the map selection is confirmed.
+	 */
 	private void mapSelected() {
 		compositeNetwork.setEnabled(true);
 		compositeMap.setEnabled(false);
 		selectMap.setText("You can now click on the screen to the right.");
 	}
 	
+	/**
+	 * A method to call the server controller to start creating a server based on
+	 * user input from the UI.
+	 */
 	private void hostServer() {
 		if (validateInput()) {
 			try {
@@ -164,7 +199,14 @@ public class HostScreen extends Screen {
 			port.setText("");
 		}
 	}
-		
+	
+	/**
+	 * A method to validate the user input, specifically the port number
+	 * given.
+	 * 
+	 * @return	a boolean. true if input is successfully validated. false
+	 * 			if input is rejected.
+	 */
 	private boolean validateInput() {		
 		if (port.getText().isBlank())
 			return false;
@@ -175,10 +217,17 @@ public class HostScreen extends Screen {
 		return true;
 	}
 
+	/**
+	 * A method to update the number of players on the UI.
+	 */
 	private void updatePlCount() {
 		numPlayers.setText("Number of players:\t" + hModel.getPlayer());
 	}
 	
+	/**
+	 * A method to to call the controller to close the server and
+	 * return to the title screen.
+	 */
 	private void closeServer() {
 		hControl.updateScreen(Mode.MAIN);
 		hControl.closeServer();

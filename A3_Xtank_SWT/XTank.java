@@ -1,12 +1,13 @@
+/**
+ * A class that has a main function to run the entire program.
+ * It also links the model, view, and controller together.
+ * 
+ * @author	Patrick Comden
+ * @version	1.0
+ * @since	2022-11-12
+ */
 
-import java.net.Socket;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
-public class XTank 
-{
+public class XTank {
 	public static void main(String[] args) throws Exception  {
 		XTankUI ui = XTankUI.get();
 		ClientModel cModel = new ClientModel();
