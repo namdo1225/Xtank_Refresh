@@ -33,6 +33,10 @@ public class Server
 	private static ExecutorService					bullet_thread;
 	private static Lock								bullet_lock;
 	private static GameMap							map;
+	private static int								max_lives;
+	private static final int initial_x = 50;
+	private static final int initial_y = 50;
+	private static final int initial_angle = 0;
 	
 	/**
 	 * Constructor for Server.
@@ -40,12 +44,13 @@ public class Server
 	 * @param port		an int for the port number.
 	 * @param mapNum	an int for the maze map's id.
 	 */
-    public Server(int port, int mapNum) {
+    public Server(int port, int mapNum, int max_lives) {
 		//System.out.println(InetAddress.getLocalHost());
 		sq = new ArrayList<ObjectOutputStream>();
 		tanks = new HashMap<Integer, Tank>();
 		bullets = new ArrayList<Bullet>();
 		map = new GameMap(mapNum);
+		this.max_lives = max_lives;
 		Bullet.setMap(map);
         try
         {
@@ -128,6 +133,49 @@ public class Server
 						}
 					}
 					else {
+						boolean deleted = false;
+						for (var key : tanks.keySet()) {
+							if (tanks.get(key).rectCollides(bullets.get(i).getX(), bullets.get(i).getY(),
+									bullets.get(i).getX() + Bullet.size, bullets.get(i).getY() + Bullet.size))
+							{
+								bullets.remove(i);
+								i--;
+								// remove bullet from clients
+								for (var client : sq) {
+									InputPacket bullet_update = new InputPacket(i + 1, 0, 0, 0, true);
+									bullet_update.is_bullet = true;
+									try {
+										client.writeObject(bullet_update);
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+								}
+								int lives = tanks.get(key).getLives();
+								if (!tanks.get(key).hit()) {
+									// kill tank
+									
+									// check if there is winner
+									
+								}
+								else {
+									if (lives != tanks.get(key).getLives()) {
+										tanks.get(key).set(initial_x, initial_y, initial_angle);
+										for (var client : sq) {
+											InputPacket tank_reset = new InputPacket(key, initial_x, initial_y, initial_angle, false);
+											try {
+												client.writeObject(tank_reset);
+											} catch (IOException e) {
+												e.printStackTrace();
+											}
+										}
+									}
+								}
+								deleted = true;
+								break;
+							}
+						}
+						if (deleted)
+							continue;
 						for (var client : sq) {
 							InputPacket bullet_update = new InputPacket(i, (int)bullets.get(i).getX(), (int)bullets.get(i).getY(),
 																		0, false);
@@ -186,9 +234,7 @@ public class Server
             {
             	out = new ObjectOutputStream(socket.getOutputStream());
             	out.flush();
-            	int initial_x = 50;
-            	int initial_y = 50;
-            	int initial_angle = 0;
+            	
             	new_id = getNewID();
             	System.out.println("Adding new tank: " + new_id);
             	out.writeObject(map.getID());
@@ -205,7 +251,7 @@ public class Server
             		out.writeObject(packet);
             	}
             	//System.out.println(3);
-            	tanks.put(new_id, new Tank(initial_x, initial_y, new_id));
+            	tanks.put(new_id, new Tank(initial_x, initial_y, new_id, max_lives, 2));
             	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             	
             	//System.out.println(4);

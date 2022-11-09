@@ -189,7 +189,7 @@ public class HostScreen extends Screen {
 	private void hostServer() {
 		if (validateInput()) {
 			try {
-				hControl.createServer(Integer.parseInt(port.getText()), mapID);
+				hControl.createServer(Integer.parseInt(port.getText()), mapID, maxLives);
 			} catch (Exception e) {}
 		
 			update.setEnabled(false);

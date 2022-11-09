@@ -37,9 +37,9 @@ public class HostController {
 	 * @param port		an int for the server's port number.
 	 * @param mapNum	an int for the map maze's id.
 	 */
-	public void createServer(int port, int mapNum) {
+	public void createServer(int port, int mapNum, int max_lives) {
 		try {
-			hostModel.setServer(port, mapNum);
+			hostModel.setServer(port, mapNum, max_lives);
 		} catch (Exception e) {}
 	}
 

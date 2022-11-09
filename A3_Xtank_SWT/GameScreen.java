@@ -117,6 +117,7 @@ public class GameScreen extends Screen {
 
 		canvas = new Canvas(compositeGame, SWT.TRANSPARENT);
 		canvas.setBounds(0, 0, 800, 500);
+		shell.forceFocus();
 	}
 	
 	/**

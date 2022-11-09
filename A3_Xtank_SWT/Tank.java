@@ -11,6 +11,9 @@ public class Tank {
 	private float			y;
 	private int				rotate;
 	private int				id;
+	private int				lives;
+	private int				armor;
+	private int 			default_armor;
 	public static final int width = 25;
 	public static final int height = 50;
 	
@@ -26,6 +29,16 @@ public class Tank {
 		this.y = y;
 		this.rotate = 0;
 		this.id = id;
+	}
+	
+	public Tank(int x, int y, int id, int lives, int armor) {
+		this.x = x;
+		this.y = y;
+		this.rotate = 0;
+		this.id = id;
+		this.lives = lives;
+		this.armor = armor;
+		this.default_armor = armor;
 	}
 	
 	/**
@@ -130,5 +143,58 @@ public class Tank {
 	 */
 	public int getID() {
 		return id;
+	}
+	
+	/**
+	 * A getter to retun the tank's armor.
+	 * 
+	 * @return	an int for the tank's armor.
+	 */
+	public int getArmor() {
+		return armor;
+	}
+	
+	/**
+	 * A getter to retun the tank's lives.
+	 * 
+	 * @return	an int for the tank's lives.
+	 */
+	public int getLives() {
+		return lives;
+	}
+	
+	/**
+	 * Returns true if box collides with tank.
+	 * 
+	 * @return a boolean for collision.
+	 */
+	public boolean rectCollides(float x1, float y1, float x2, float y2) {
+		if (x1 < x + width &&
+				x2 > x &&
+				y1 < y + height &&
+				y2 > y)
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Decreases armor value, and if armor is 0, t hen decreases life.
+	 * 
+	 * @return a boolean for whether the tank is still alive.
+	 */
+	public boolean hit() {
+		armor--;
+		if (armor <= 0) {
+			lives--;
+			if (lives <= 0) {
+				return false;
+			}
+			armor = default_armor;
+		}
+		
+		return true;
 	}
 }
