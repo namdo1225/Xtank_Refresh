@@ -33,7 +33,7 @@ public class Server
 	private static ExecutorService					bullet_thread;
 	private static Lock								bullet_lock;
 	private static GameMap							map;
-	private static int								max_lives;
+	private static int								maxLives;
 	private static final int initial_x = 50;
 	private static final int initial_y = 50;
 	private static final int initial_angle = 0;
@@ -43,14 +43,15 @@ public class Server
 	 * 
 	 * @param port		an int for the port number.
 	 * @param mapNum	an int for the maze map's id.
+	 * @param maxLives	an int for the set max lives for each player.
 	 */
-    public Server(int port, int mapNum, int max_lives) {
+    public Server(int port, int mapNum, int maxLives) {
 		//System.out.println(InetAddress.getLocalHost());
 		sq = new ArrayList<ObjectOutputStream>();
 		tanks = new HashMap<Integer, Tank>();
 		bullets = new ArrayList<Bullet>();
 		map = new GameMap(mapNum);
-		this.max_lives = max_lives;
+		Server.maxLives = maxLives;
 		Bullet.setMap(map);
         try
         {
@@ -251,7 +252,7 @@ public class Server
             		out.writeObject(packet);
             	}
             	//System.out.println(3);
-            	tanks.put(new_id, new Tank(initial_x, initial_y, new_id, max_lives, 2));
+            	tanks.put(new_id, new Tank(initial_x, initial_y, new_id, maxLives, 2));
             	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             	
             	//System.out.println(4);
@@ -277,8 +278,8 @@ public class Server
         			}
                 	if (input.shoot) {
                 		System.out.println("shoot");
-                		float x = (float) (tank.getX() + (tank.width / 2) + tank.getDirectionX() * 50);
-                		float y = (float) (tank.getY() + (tank.height / 2) - tank.getDirectionY() * 50);
+                		float x = (float) (tank.getX() + (Tank.width / 2) + tank.getDirectionX() * 50);
+                		float y = (float) (tank.getY() + (Tank.height / 2) - tank.getDirectionY() * 50);
                 		bullet_lock.lock();
                 		bullets.add(new Bullet(x, y, tank.getRotate(), 10));
                 		bullet_lock.unlock();

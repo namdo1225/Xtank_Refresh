@@ -48,9 +48,10 @@ public class HostModel {
 	 * 
 	 * @param port		an int of the port number
 	 * @param mapNum	an int of the map maze's id
+	 * @param maxLives	an int for the set max lives for each player.
 	 */
-	public void setServer(int port, int mapNum, int max_lives) {
-        server = new Server(port, mapNum, max_lives);
+	public void setServer(int port, int mapNum, int maxLives) {
+        server = new Server(port, mapNum, maxLives);
 	}
 	
 	/**
