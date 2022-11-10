@@ -76,7 +76,7 @@ public class MenuScreen extends Screen {
 		updateWinner = new Button(composite, SWT.PUSH);
 		updateWinner.setText("Update Winner");
 		updateWinner.addSelectionListener(
-				SelectionListener.widgetSelectedAdapter(e-> System.out.println(0)));
+				SelectionListener.widgetSelectedAdapter(e-> updateWinner()));
 		
 		winner = new Label(composite, SWT.BALLOON);
 		winner.setText("No winner");
@@ -86,5 +86,13 @@ public class MenuScreen extends Screen {
 		composite.setLayout(new FillLayout(SWT.VERTICAL));
 		
 		return composite;
+	}
+	
+	private void updateWinner() {
+		if (cModel.getWinner() == -1)
+			winner.setText("No winner");
+		else
+			winner.setText("Winner: Player " + cModel.getWinner());
+
 	}
 }
