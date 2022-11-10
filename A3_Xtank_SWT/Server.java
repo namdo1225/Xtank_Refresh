@@ -170,8 +170,8 @@ public class Server
 									}
 									// check if there is winner
 									if (tanks.size() == 1) { 
-										System.out.println("Winner!!!");
 										for (var winner_id : tanks.keySet()) {
+											System.out.println("Winner!!! "  + winner_id);
 											// -69 is out of range, reserved for winner
 											InputPacket winner_packet = new InputPacket(winner_id, -69, -69, -69, false);
 											for (var client : sq) {
