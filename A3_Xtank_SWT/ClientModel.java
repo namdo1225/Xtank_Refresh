@@ -289,22 +289,31 @@ public class ClientModel {
 								bullets.get(packet.id).set(packet.x, packet.y);
 							}
 							// delete bullet
-							if (packet.shoot) {
+							if (packet.delete) {
 								bullets.remove(packet.id);
 							}
 						}
 						else {
-							// used if new tank added after this local tank was added
-							if (packet.id == tank.getID()) {
-								tank.set(packet.x, packet.y, packet.angle);
-								tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+							if (packet.x == -69 && packet.y == -69 && packet.angle == -69) {
+								// TODO: send packet.id as winner to ui somehow
+								
 							}
-							else if (!tanks.containsKey(packet.id)) {
-								tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id));
-								tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+							if (packet.delete) {
+								tanks.remove(packet.id);
 							}
 							else {
-								tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+								// used if new tank added after this local tank was added
+								if (packet.id == tank.getID()) {
+									tank.set(packet.x, packet.y, packet.angle);
+									tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+								}
+								else if (!tanks.containsKey(packet.id)) {
+									tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id));
+									tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+								}
+								else {
+									tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+								}
 							}
 						}
 					}

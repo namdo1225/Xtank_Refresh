@@ -15,6 +15,7 @@ public class InputPacket implements java.io.Serializable {
 	public int					angle;
 	public boolean				shoot;
 	public boolean				is_bullet;
+	public boolean 				delete;
 	
 	/**
 	 * First constructor for InputPacket.
@@ -42,17 +43,6 @@ public class InputPacket implements java.io.Serializable {
 		this.angle = angle;
 		this.shoot = shoot;
 		this.is_bullet = false;
+		this.delete = false;
 	}
-}
-
-/**
- * A class to that represents a simple packet with an int to
- * be sent back and forth between server and client.
- * 
- * @author	Patrick Comden
- * @version	1.0
- * @since	2022-11-12
- */
-class IntPacket {
-	public int number;
 }
