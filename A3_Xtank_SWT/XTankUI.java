@@ -2,6 +2,7 @@
  * A class that represents the entire UI and the view of the MVC.
  * 
  * Pattern: the view of the MVC.
+ * 			Singleton pattern.
  * 
  * @author	Nam Do
  * @version	1.0
@@ -17,20 +18,21 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 public class XTankUI {
-	private static XTankUI			ui;
-	private Display					display;
-	private Shell					shell;
+	private static XTankUI					view;
 	
-	private ClientModel				clientModel;
-	private ClientController		clientControl;
+	private static Display					display;
+	private static Shell					shell;
 	
-	private HostModel				hostModel;
-	private HostController			hostControl;
+	private static ClientModel				clientModel;
+	private static ClientController			clientControl;
 	
-	private	Screen[]				screens;
-	private GridData[]				gridDatas;
+	private static HostModel				hostModel;
+	private static HostController			hostControl;
+	
+	private	static Screen[]					screens;
+	private static GridData[]				gridDatas;
 
-	private GridLayout				layout;
+	private static GridLayout				layout;
 	
 	/**
 	 * A getter to get the singular XTankUI object.
@@ -38,9 +40,9 @@ public class XTankUI {
 	 * @return	a XTankUI object.
 	 */
 	public synchronized static XTankUI get() {
-		if (ui == null)
-			ui = new XTankUI();
-		return ui;
+		if (view == null)
+			view = new XTankUI();
+		return view;
 	}
 
 	/**
