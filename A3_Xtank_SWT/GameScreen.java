@@ -222,13 +222,17 @@ public class GameScreen extends Screen {
 				
 				// get tank info
 				Tank tank = tanks.get(key);
-				Rectangle tank_body = new Rectangle(tank.getX(), tank.getY(), tank.width, tank.height);
+				int x = tank.getX();
+				int y = tank.getY();
+				int w = Tank.width;
+				int h = Tank.height;
+				Rectangle tank_body = new Rectangle(x, y, w, h);
 				Transform transform = new Transform(display);
 				
 				// move tank
-				transform.translate(tank.getX() + (tank.width / 2), tank.getY() + (tank.height / 2));
+				transform.translate(x + (w / 2), y + (h / 2));
 				transform.rotate(-(float)tank.getRotate() + 90.0f);
-				transform.translate(-tank.getX() - (tank.width / 2), -tank.getY() - (tank.height / 2));
+				transform.translate(-x - (w / 2), -y - (h / 2));
 				event.gc.setTransform(transform);
 				
 				// draw main rectangle
@@ -237,17 +241,17 @@ public class GameScreen extends Screen {
 				
 				// draw circle thing
 				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color2));
-				event.gc.fillOval(tank.getX(), tank.getY()+(tank.width/2), tank.width, tank.width);
+				event.gc.fillOval(x, y+(w/2), w, w);
 				
 				// draw line
 				event.gc.setLineWidth(4);
 				event.gc.setForeground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_BLACK));
-				event.gc.drawLine(tank.getX()+(tank.width/2), tank.getY()+(tank.width/2), tank.getX()+(tank.width/2), tank.getY()-15);
+				event.gc.drawLine(x+(w/2), y+(w/2), x+(w/2), y-15);
 
 				// draw id
 				event.gc.setForeground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-				event.gc.drawText(String.valueOf(tank.getID()), tank.getX() + 10, tank.getY()+(tank.width/2));
-				map.collision(tank.getX(), tank.getY(), tank.getX() + tank.height, tank.getY() + tank.height);
+				event.gc.drawText(String.valueOf(tank.getID()), x + 10, y+(w/2));
+				map.collision(x, y, x + h, y + h);
 			}
 		});
 		
