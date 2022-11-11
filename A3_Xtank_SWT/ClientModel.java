@@ -44,6 +44,8 @@ public class ClientModel {
 	private	int							tankModel;
 	private boolean						terminate;
 	
+	private int							winner;
+	
 	/**
 	 * Constructor for ClientModel.
 	 */
@@ -52,6 +54,7 @@ public class ClientModel {
 		tanks = new HashMap<>();
 		bullets = new ArrayList<>();
 		tank = new Tank(0, 0, 0);
+		winner = -1;
 	}
 	
 	/**
@@ -220,6 +223,10 @@ public class ClientModel {
 		}
 	}
 	
+	public int getWinner() {
+		return winner;
+	}
+	
 	/**
 	 * A method to see if the client's thread pool is set
 	 * to be terminated.
@@ -294,8 +301,7 @@ public class ClientModel {
 						}
 						else {
 							if (packet.x == -69 && packet.y == -69 && packet.angle == -69) {
-								// TODO: send packet.id as winner to ui somehow
-								
+								winner = packet.id;								
 							}
 							if (packet.delete) {
 								tanks.remove(packet.id);
