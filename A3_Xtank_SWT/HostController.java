@@ -3,6 +3,7 @@
  * for the host's model.
  * 
  * Pattern: Controller for the server from the MVC.
+ * 			Singleton pattern.
  * 
  * @author	Nam Do
  * @version	1.0
@@ -10,7 +11,25 @@
  */
 
 public class HostController {
-	private HostModel			hostModel;
+	private static HostController		controller;
+	
+	private static HostModel			hostModel;
+	
+	/**
+	 * Private constructor for HostController.
+	 */
+	private HostController() {}
+	
+	/**
+	 * A getter to get the singular HostController object.
+	 * 
+	 * @return	a HostController object.
+	 */
+	public synchronized static HostController get() {
+		if (controller == null)
+			controller = new HostController();
+		return controller;
+	}
 	
 	/**
 	 * Set the model for the server's controller so it can be

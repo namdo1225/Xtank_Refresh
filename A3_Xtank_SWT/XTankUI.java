@@ -2,6 +2,7 @@
  * A class that represents the entire UI and the view of the MVC.
  * 
  * Pattern: the view of the MVC.
+ * 			Singleton pattern.
  * 
  * @author	Nam Do
  * @version	1.0
@@ -31,6 +32,11 @@ public class XTankUI {
 	private GridData[]				gridDatas;
 
 	private GridLayout				layout;
+	
+	/**
+	 * Private constructor for XTankUI.
+	 */
+	private XTankUI() {}
 	
 	/**
 	 * A getter to get the singular XTankUI object.

@@ -10,11 +10,11 @@
 public class XTank {
 	public static void main(String[] args) throws Exception  {
 		XTankUI ui = XTankUI.get();
-		ClientModel cModel = new ClientModel();
-		ClientController cController = new ClientController();
+		ClientModel cModel = ClientModel.get();
+		ClientController cController = ClientController.get();
 		
-		HostModel hModel = new HostModel();
-		HostController hController = new HostController();
+		HostModel hModel = HostModel.get();
+		HostController hController = HostController.get();
 		
 		ui.setClientMVC(cModel, cController);
 		cController.setMVC(cModel);
@@ -27,5 +27,3 @@ public class XTank {
 		ui.start();
     }
 }
-
-

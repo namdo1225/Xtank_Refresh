@@ -4,6 +4,7 @@
  * of the clients.
  * 
  * Pattern: Model for the server from the MVC.
+ * 			Singleton pattern.
  * 
  * @author	Nam Do
  * @version	1.0
@@ -11,16 +12,30 @@
  */
 
 public class HostModel {	
-	private XTankUI			hostView;
-	private Mode			mode;
+	private static HostModel	model;
 	
-	private Server			server;
+	private static XTankUI		hostView;
+	private static Mode			mode;
+	
+	private static Server		server;
 	
 	/**
-	 * Constructor for HostModel.
+	 * Private constructor for HostModel.
 	 */
-	public HostModel() {
+	private HostModel() {
 		mode = Mode.MAIN;
+	}
+	
+	/**
+	 * A getter to get the singular HostModel object.
+	 * 
+	 * @return	a HostModel object.
+	 */
+	public synchronized static HostModel get() {
+		if (model == null) {
+			model = new HostModel();
+		}
+		return model;
 	}
 	
 	/**

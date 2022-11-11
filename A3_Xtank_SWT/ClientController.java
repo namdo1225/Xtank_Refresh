@@ -3,6 +3,7 @@
  * for the client's model.
  * 
  * Pattern: Controller for the client from the MVC.
+ * 			Singleton pattern.
  * 
  * @author	Nam Do
  * @version	1.0
@@ -12,7 +13,25 @@
 import java.io.IOException;
 
 public class ClientController {
-	private ClientModel				clientModel;
+	private static ClientController	controller;
+	
+	private static ClientModel		clientModel;
+	
+	/**
+	 * Private constructor for ClientController.
+	 */
+	private ClientController() {}
+	
+	/**
+	 * A getter to get the singular ClientController object.
+	 * 
+	 * @return	a ClientController object.
+	 */
+	public synchronized static ClientController get() {
+		if (controller == null)
+			controller = new ClientController();
+		return controller;
+	}
 	
 	/**
 	 * A method to set the model for the controller so the controller

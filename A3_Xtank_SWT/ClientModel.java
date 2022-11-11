@@ -5,6 +5,7 @@
  * It also has a socket to connect to a server.
  * 
  * Pattern: Model for the client from the MVC.
+ * 			Singleton pattern.
  * 
  * @author	Nam Do
  * @version	1.0
@@ -23,38 +24,51 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ClientModel {	
-	private XTankUI						clientView;
+public class ClientModel {
+	private static ClientModel			model;
+
+	private static XTankUI				clientView;
 	
-	private Mode						mode;
+	private static Mode					mode;
 	
-	private	Socket						socket;
-	private ObjectInputStream 			in;
-	private ObjectOutputStream 			out;
-	private InputPacket					new_tank;
+	private	static Socket				socket;
+	private static ObjectInputStream 	in;
+	private static ObjectOutputStream 	out;
+	private static InputPacket			new_tank;
 	
-	private Tank						tank;
+	private static Tank					tank;
 	
-	private Map<Integer, Tank>			tanks;
-	private List<Bullet>				bullets;
+	private static Map<Integer, Tank>	tanks;
+	private static List<Bullet>			bullets;
 	
-	private Runner						runnable;
-	private ExecutorService				pool;
+	private static Runner				runnable;
+	private static ExecutorService		pool;
 	
 	private	int							tankModel;
 	private boolean						terminate;
-	
 	private int							winner;
 	
 	/**
-	 * Constructor for ClientModel.
+	 * Private constructor for ClientModel.
 	 */
-	public ClientModel() {
+	private ClientModel() {
+		winner = -1;
 		mode = Mode.MAIN;
 		tanks = new HashMap<>();
 		bullets = new ArrayList<>();
 		tank = new Tank(0, 0, 0);
-		winner = -1;
+	}
+	
+	/**
+	 * A getter to get the singular ClientModel object.
+	 * 
+	 * @return	a ClientModel object.
+	 */
+	public synchronized static ClientModel get() {
+		if (model == null) {
+			model = new ClientModel();
+		}
+		return model;
 	}
 	
 	/**
