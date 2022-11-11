@@ -209,6 +209,22 @@ public class Server {
 											}
 										}
 									}
+									else {
+										// update visual armor client-side
+										for (ObjectOutputStream o: sq)
+					                	{
+					                    	InputPacket to_client = new InputPacket(key, 
+					                    			tanks.get(key).getX(), tanks.get(key).getY(),
+					                    			tanks.get(key).getRotate(), false);
+					                    	to_client.armor = tanks.get(key).getArmor();
+					    					try {
+												o.writeObject(to_client);
+											} catch (IOException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											}
+					                	}
+									}
 								}
 								deleted = true;
 								break;
@@ -343,7 +359,7 @@ public class Server {
 	                    	InputPacket to_client = new InputPacket(input.id, 
 	                    			tanks.get(input.id).getX(), tanks.get(input.id).getY(),
 	                    			tanks.get(input.id).getRotate(), false);
-	                    	
+	                    	to_client.armor = tanks.get(input.id).getArmor();
 	    					o.writeObject(to_client);
 	    					o.flush();
 	                	}
