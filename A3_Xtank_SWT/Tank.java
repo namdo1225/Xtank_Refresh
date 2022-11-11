@@ -1,3 +1,5 @@
+import org.eclipse.swt.SWT;
+
 /**
  * A class to represent the tank of the game.
  * 
@@ -14,23 +16,43 @@ public class Tank {
 	private int				lives;
 	private int				armor;
 	private int 			default_armor;
+	
+	private boolean			armorExist;
+	
+	private int				tankBody;
+	private int				tankRotatorAndCannon;
+	
 	public static final int width = 25;
 	public static final int height = 50;
 	
 	/**
-	 * A constructor for Tank.
+	 * The first constructor for Tank.
 	 * 
 	 * @param x		an int for the tank's x position.
 	 * @param y		an int for the tank's y position.
 	 * @param id	an int for the tank's id.
+	 * @param armor	an int for the tank's amount of armor.
 	 */
-	public Tank(int x, int y, int id) {
+	public Tank(int x, int y, int id, int armor) {
 		this.x = x;
 		this.y = y;
 		this.rotate = 0;
 		this.id = id;
+		this.armor = armor;
+		this.default_armor = armor;
+		armorExist = false;
+		setColorScheme();
 	}
 	
+	/**
+	 * The second constructor for Tank.
+	 * 
+	 * @param x		an int for the tank's x position.
+	 * @param y		an int for the tank's y position.
+	 * @param lives	an int for the tank's lives.
+	 * @param id	an int for the tank's id.
+	 * @param armor	an int for the tank's amount of armor.
+	 */
 	public Tank(int x, int y, int id, int lives, int armor) {
 		this.x = x;
 		this.y = y;
@@ -39,6 +61,43 @@ public class Tank {
 		this.lives = lives;
 		this.armor = armor;
 		this.default_armor = armor;
+		armorExist = false;
+		setColorScheme();
+	}
+	
+	/**
+	 * Set the color scheme of the tank to be displayed on the
+	 * game screen.
+	 */
+	private void setColorScheme() {
+		tankBody = SWT.COLOR_DARK_GREEN;
+		tankRotatorAndCannon = SWT.COLOR_BLACK;
+		
+		System.out.println("Armor: " + default_armor);
+		
+		if (default_armor == 2) {
+			tankBody = SWT.COLOR_DARK_RED;
+			tankRotatorAndCannon = SWT.COLOR_GRAY;
+		}
+	}
+	
+	/**
+	 * Getter for tank body's color.
+	 * 
+	 * @return	an int representing the tank's body color.
+	 */
+	public int getBodyColor() {
+		return tankBody;
+	}
+	
+	/**
+	 * Getter for tank's rotator and cannon color.
+	 * 
+	 * @return	an int representing the tank's rotator
+	 * and cannon coloro.
+	 */
+	public int getCannonColor() {
+		return tankRotatorAndCannon;
 	}
 	
 	/**
@@ -69,6 +128,7 @@ public class Tank {
 	 * @param x			an int for the tank's x position.
 	 * @param y			an int for the tank's y position.
 	 * @param rotate	an int for the tank's rotation.
+	 * @param armor		an int for the tank's armor.
 	 */
 	public void set(int x, int y, int rotate, int armor) {
 		this.x = x;
@@ -182,20 +242,21 @@ public class Tank {
 	}
 	
 	/**
-	 * Decreases armor value, and if armor is 0, t hen decreases life.
+	 * Decreases armor value, and if armor is 0, then decreases life.
 	 * 
 	 * @return a boolean for whether the tank is still alive.
 	 */
 	public boolean hit() {
-		System.out.println("Tank " + id + " is hit, armor is now " + (armor - 1));
+		System.out.println("Tank " + id + " is hit, armor is now " + (armor - 1) + ". Lives is " + lives);
 		armor--;
-		if (armor <= 0) {
+		if (armorExist && armor <= 0) {
 			lives--;
 			if (lives <= 0) {
 				return false;
 			}
-			armor = default_armor;
-		}
+			//armor = default_armor;
+		} else if (armor <= 0)
+			armorExist = true;
 		
 		return true;
 	}

@@ -201,16 +201,7 @@ public class GameScreen extends Screen {
 	 */
 	private void makeCompChange(Display display, int mapID, int tankModel, int tankID) {
 		map = new GameMap(display, compositeGame, mapID);
-		
-		color1 = SWT.COLOR_DARK_GREEN;
-		color2 = SWT.COLOR_BLACK;
-		if (tankModel == 2) {
-			color1 = SWT.COLOR_DARK_RED;
-			color2 = SWT.COLOR_GRAY;
-		}
-		
 		canvas.addPaintListener(event -> paint(event));
-		
 		plHeader.setText("You are\nplayer:\n" + tankID);
 	}
 
@@ -222,6 +213,7 @@ public class GameScreen extends Screen {
 			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
 			event.gc.fillRectangle(bullet_body);
 		}
+		
 		//Tank tank = cModel.getTank();
 		Map<Integer, Tank> tanks = cModel.getTanks();
 		for (var key : tanks.keySet()) {
@@ -235,6 +227,13 @@ public class GameScreen extends Screen {
 			Rectangle tank_body = new Rectangle(x, y, w, h);
 			Transform transform = new Transform(composite.getDisplay());
 			
+			color1 = tank.getBodyColor();
+			color2 = tank.getCannonColor();
+			
+			// draw shield
+			//event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color2));
+			//event.gc.fillOval(x - 20, y+(w/2) - 20, w + 40, w + 40);
+			
 			// move tank
 			transform.translate(x + (w / 2), y + (h / 2));
 			transform.rotate(-(float)tank.getRotate() + 90.0f);
@@ -245,7 +244,7 @@ public class GameScreen extends Screen {
 			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color1));
 			event.gc.fillRectangle(tank_body);
 			
-			// draw circle thing
+			// draw circle on tank
 			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color2));
 			event.gc.fillOval(x, y+(w/2), w, w);
 			

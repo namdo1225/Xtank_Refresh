@@ -34,9 +34,11 @@ public class Server {
 	private static Lock								tank_lock;
 	private static GameMap							map;
 	private static int								max_lives;
-	private static final int initial_x = 50;
-	private static final int initial_y = 50;
-	private static final int initial_angle = 0;
+	private static final int						initial_x = 50;
+	private static final int 						initial_y = 50;
+	private static final int						initial_angle = 0;
+	
+    private static int								clients;
 	
 	/**
 	 * Constructor for Server.
@@ -46,6 +48,7 @@ public class Server {
 	 */
     public Server(int port, int mapNum, int max_lives) {
 		//System.out.println(InetAddress.getLocalHost());
+    	clients = 0;
 		sq = new ArrayList<ObjectOutputStream>();
 		tanks = new HashMap<Integer, Tank>();
 		bullets = new ArrayList<Bullet>();
@@ -72,7 +75,7 @@ public class Server {
      * @return	an int for the players count.
      */
     public int getPlCount() {
-    	return XTankConnection.getPlCount();
+    	return clients;
     }
     
     /**
@@ -100,6 +103,7 @@ public class Server {
     	
     	if (pool != null)
     		pool.shutdownNow();
+    	clients = 0;
     }
     
     /**
@@ -256,13 +260,11 @@ public class Server {
          * and server's outputs to maintain game flow.
          */
         @Override
-        public void run() 
-        {
+        public void run() {
             System.out.println("Connected: " + socket);
             ObjectOutputStream out = null;
             int new_id = -1;
-            try 
-            {
+            try {
             	out = new ObjectOutputStream(socket.getOutputStream());
             	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             	out.flush();
@@ -273,7 +275,6 @@ public class Server {
             	System.out.println("Model: " + armor_type);
             	int tank_armor = 0;
             	switch (armor_type) {
-            	case 0:
             	case 1:
             		tank_armor = 3;
             		break;
@@ -294,7 +295,7 @@ public class Server {
             	// loop through all tanks and send
             	for (var key : tanks.keySet()) {
             		InputPacket packet = new InputPacket(tanks.get(key).getID(),
-            				tanks.get(key).getX(), tanks.get(key).getX(), tanks.get(key).getRotate(), false);
+            				tanks.get(key).getX(), tanks.get(key).getY(), tanks.get(key).getRotate(), false);
             		packet.armor = tanks.get(key).getArmor();
             		out.writeObject(packet);
             	}
@@ -307,8 +308,7 @@ public class Server {
                 sq.add(out);
                 //System.out.println(5);
                 // send old tanks to new tank
-                while (true)
-                {
+                while (true) {
                 	InputPacket input = (InputPacket)in.readObject();
                 	// update tank position server side
                 	final int SPEED = 5;
@@ -346,16 +346,14 @@ public class Server {
                 	tank_lock.unlock();
                 }
             }
-            catch (Exception e) 
-            {
+            catch (Exception e) {
                 System.out.println("Error:" + socket);
             } 
-            finally 
-            {
+            finally {
             	sq.remove(out);
             	if (new_id > -1)
             		tanks.remove(new_id);
-            	Server.XTankConnection.setPlCount(Server.XTankConnection.getPlCount() - 1);
+            	clients--;
                 try { socket.close(); } 
                 catch (IOException e) {}
                 System.out.println("Closed: " + socket);
@@ -373,7 +371,6 @@ public class Server {
      */
     private static class XTankConnection implements Runnable {
         private Socket					socket;
-        private static int				clients;
         
         /**
          * Constructor for XTankConnection.
@@ -386,8 +383,7 @@ public class Server {
          * A method to run the task, which keeps accepting new player connections.
          */
         @Override
-        public void run() 
-        {
+        public void run() {
         	while (true) {
                 try {
                 	socket = listener.accept();
@@ -397,25 +393,6 @@ public class Server {
             		poolTest.execute(new XTankManager(socket));
                 } catch (IOException e) {}
         	}
-        }
-
-        /**
-         * A getter to return the number of clients connected to the server.
-         * 
-         * @return	an int for the number of clients.
-         */
-        public static int getPlCount() {
-        	return clients;
-        }
-        
-        /**
-         * A setter for the number of clients connected to the server.
-         * 
-         * @param players	an int for the number of clients to be updated
-         * 					in the server.
-         */
-        public static void setPlCount(int players) {
-        	clients = players;
         }
     }
 }

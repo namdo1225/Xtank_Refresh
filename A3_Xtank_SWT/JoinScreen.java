@@ -47,7 +47,7 @@ public class JoinScreen extends Screen {
 	private Button		next;
 	private Button		backJoin;
 	
-	private int			tankID;
+	private int			tankModel;
 	
 	/**
 	 * A constructor for JoinScreen.
@@ -62,6 +62,7 @@ public class JoinScreen extends Screen {
 	public JoinScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
 		super(shell, display, cCon, hCon, cMod, hMod);
+		tankModel = 1;
 	}
 	
 	/**
@@ -95,18 +96,18 @@ public class JoinScreen extends Screen {
 		titleTank.setAlignment(SWT.CENTER);
 		
 		tankGroup = new Group(compositeTank, SWT.NONE);
-		tankGroup.setLayout(new FillLayout(SWT.HORIZONTAL));
+		tankGroup.setLayout(new FillLayout(SWT.VERTICAL));
 		
 		tank1 = new Button(tankGroup, SWT.RADIO);
-		tank1.setText("Tank 1, Weapon: Normal, Armor: Normal");
+		tank1.setText("Tank 1, Weapon: Normal, Armor: Normal (3 pts)");
 		tank1.setSelection(true);
 		tank1.addSelectionListener(
-				SelectionListener.widgetSelectedAdapter(e-> tankID = 1));
+				SelectionListener.widgetSelectedAdapter(e-> tankModel = 1));
 		
 		tank2 = new Button(tankGroup, SWT.RADIO);
-		tank2.setText("Tank 2, Weapon: Fast, Armor: Weak");
+		tank2.setText("Tank 2, Weapon: Fast, Armor: Weak (2 pts)");
 		tank2.addSelectionListener(
-				SelectionListener.widgetSelectedAdapter(e-> tankID = 2));
+				SelectionListener.widgetSelectedAdapter(e-> tankModel = 2));
 		
 		selectTank = new Button(compositeTank, SWT.PUSH);
 		selectTank.setText("Continue");
@@ -170,8 +171,7 @@ public class JoinScreen extends Screen {
 		compositeJoin.setEnabled(true);
 		compositeTank.setEnabled(false);
 		selectTank.setText("You can now click on the screen to the right.");
-		
-		cControl.setTankModel(tankID);
+		cControl.setTankModel(tankModel);
 	}
 	
 	/**

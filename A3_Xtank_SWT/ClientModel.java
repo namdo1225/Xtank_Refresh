@@ -56,7 +56,7 @@ public class ClientModel {
 		mode = Mode.MAIN;
 		tanks = new HashMap<>();
 		bullets = new ArrayList<>();
-		tank = new Tank(0, 0, 0);
+		tank = new Tank(0, 0, 0, 0);
 	}
 	
 	/**
@@ -118,14 +118,14 @@ public class ClientModel {
         		for (int i = 0; i < num_tanks; i++) {
         			InputPacket enemy_tank = (InputPacket)in.readObject();
         			System.out.println("Adding enemy: " + enemy_tank.id);
-        			tanks.put(enemy_tank.id, new Tank(0, 0, enemy_tank.id));
+        			tanks.put(enemy_tank.id, new Tank(enemy_tank.x, enemy_tank.y, enemy_tank.id, enemy_tank.armor));
         			tanks.get(enemy_tank.id).set(enemy_tank.x, enemy_tank.y, enemy_tank.angle, enemy_tank.armor);
         		}
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        	tank = new Tank(new_tank.x, new_tank.y, new_tank.id);
+        	tank = new Tank(new_tank.x, new_tank.y, new_tank.id, new_tank.armor);
         	tanks.put(tank.getID(), tank);
         }
         catch (Exception e) {
@@ -224,7 +224,7 @@ public class ClientModel {
 	public void resetTankData() {
 		tanks = new HashMap<>();
 		bullets = new ArrayList<>();
-		tank = new Tank(0, 0, 0);
+		tank = new Tank(0, 0, 0, 0);
 	}
 	
 	/**
@@ -327,7 +327,7 @@ public class ClientModel {
 									tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
 								}
 								else if (!tanks.containsKey(packet.id)) {
-									tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id));
+									tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id, packet.armor));
 									tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
 								}
 								else {

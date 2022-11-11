@@ -67,7 +67,7 @@ public class HostScreen extends Screen {
 	public HostScreen(Shell shell, Display display, ClientController cCon, HostController hCon,
 			ClientModel cMod, HostModel hMod) {
 		super(shell, display, cCon, hCon, cMod, hMod);
-		
+		maxLives = 1;
 		mapID = 1;
 	}
 	
