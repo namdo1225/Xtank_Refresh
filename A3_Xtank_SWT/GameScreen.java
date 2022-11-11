@@ -48,6 +48,7 @@ public class GameScreen extends Screen {
 	
 	private	int				color1;
 	private int				color2;
+	private int				color3;
 	
 	private	ExecutorService	redrawThread;
 
@@ -230,16 +231,20 @@ public class GameScreen extends Screen {
 			color1 = tank.getBodyColor();
 			color2 = tank.getCannonColor();
 			
-			// draw shield
-			//event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color2));
-			//event.gc.fillOval(x - 20, y+(w/2) - 20, w + 40, w + 40);
-			
 			// move tank
 			transform.translate(x + (w / 2), y + (h / 2));
 			transform.rotate(-(float)tank.getRotate() + 90.0f);
 			transform.translate(-x - (w / 2), -y - (h / 2));
 			event.gc.setTransform(transform);
 			
+			// draw shield
+			if (tank.getArmor() >= 0) {
+				color3 = tank.getShield();
+				
+				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color3));
+				event.gc.fillOval(x - 20, y+(w/2) - 20, w + 40, w + 40);
+			}
+
 			// draw main rectangle
 			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color1));
 			event.gc.fillRectangle(tank_body);

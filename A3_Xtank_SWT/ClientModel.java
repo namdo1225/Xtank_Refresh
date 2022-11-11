@@ -328,6 +328,7 @@ public class ClientModel {
 								}
 								else if (!tanks.containsKey(packet.id)) {
 									tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id, packet.armor));
+									System.out.println("New tank added. Armor: " + packet.armor);
 									tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
 								}
 								else {

@@ -18,9 +18,11 @@ public class Tank {
 	private int 			default_armor;
 	
 	private boolean			armorExist;
+	private boolean			firstSet;
 	
 	private int				tankBody;
 	private int				tankRotatorAndCannon;
+	private int				tankShield;
 	
 	public static final int width = 25;
 	public static final int height = 50;
@@ -41,6 +43,7 @@ public class Tank {
 		this.armor = armor;
 		this.default_armor = armor;
 		armorExist = false;
+		firstSet = true;
 		setColorScheme();
 	}
 	
@@ -72,12 +75,13 @@ public class Tank {
 	private void setColorScheme() {
 		tankBody = SWT.COLOR_DARK_GREEN;
 		tankRotatorAndCannon = SWT.COLOR_BLACK;
-		
-		System.out.println("Armor: " + default_armor);
+		tankShield = SWT.COLOR_DARK_BLUE;
 		
 		if (default_armor == 2) {
 			tankBody = SWT.COLOR_DARK_RED;
 			tankRotatorAndCannon = SWT.COLOR_GRAY;
+			tankShield = SWT.COLOR_DARK_YELLOW;
+
 		}
 	}
 	
@@ -94,10 +98,19 @@ public class Tank {
 	 * Getter for tank's rotator and cannon color.
 	 * 
 	 * @return	an int representing the tank's rotator
-	 * and cannon coloro.
+	 * and cannon color.
 	 */
 	public int getCannonColor() {
 		return tankRotatorAndCannon;
+	}
+	
+	/**
+	 * Getter for tank's shield color.
+	 * 
+	 * @return	an int representing the tank's shield color.
+	 */
+	public int getShield() {
+		return tankShield;
 	}
 	
 	/**
@@ -123,7 +136,7 @@ public class Tank {
 	}
 	
 	/**
-	 * A setter to set the tank's position and rotation.
+	 * A setter to set the tank's position, rotation and armor.
 	 * 
 	 * @param x			an int for the tank's x position.
 	 * @param y			an int for the tank's y position.
@@ -135,6 +148,7 @@ public class Tank {
 		this.y = y;
 		this.rotate = rotate;
 		this.armor = armor;
+		System.out.println(armor);
 	}
 	
 	/**
@@ -171,7 +185,7 @@ public class Tank {
 	}
 	
 	/**
-	 * A getter to retun the tank's x position.
+	 * A getter to return the tank's x position.
 	 * 
 	 * @return	an int for the tank's x position.
 	 */
@@ -180,7 +194,7 @@ public class Tank {
 	}
 	
 	/**
-	 * A getter to retun the tank's y position.
+	 * A getter to return the tank's y position.
 	 * 
 	 * @return	an int for the tank's y position.
 	 */
@@ -189,7 +203,7 @@ public class Tank {
 	}
 	
 	/**
-	 * A getter to retun the tank's rotation.
+	 * A getter to return the tank's rotation.
 	 * 
 	 * @return	an int for the tank's rotation.
 	 */
@@ -198,7 +212,7 @@ public class Tank {
 	}
 	
 	/**
-	 * A getter to retun the tank's id.
+	 * A getter to return the tank's id.
 	 * 
 	 * @return	an int for the tank's id.
 	 */
@@ -207,7 +221,7 @@ public class Tank {
 	}
 	
 	/**
-	 * A getter to retun the tank's armor.
+	 * A getter to return the tank's armor.
 	 * 
 	 * @return	an int for the tank's armor.
 	 */
@@ -216,7 +230,7 @@ public class Tank {
 	}
 	
 	/**
-	 * A getter to retun the tank's lives.
+	 * A getter to return the tank's lives.
 	 * 
 	 * @return	an int for the tank's lives.
 	 */
