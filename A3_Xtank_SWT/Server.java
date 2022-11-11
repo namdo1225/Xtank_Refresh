@@ -102,7 +102,9 @@ public class Server {
 		} catch (IOException e) {}
     	
     	if (pool != null)
-    		pool.shutdownNow();
+    		pool.shutdown();
+    	if (pool != null)
+    		bullet_thread.shutdown();
     	clients = 0;
     }
     
@@ -308,7 +310,7 @@ public class Server {
                 sq.add(out);
                 //System.out.println(5);
                 // send old tanks to new tank
-                while (true) {
+                while (!socket.isClosed()) {
                 	InputPacket input = (InputPacket)in.readObject();
                 	// update tank position server side
                 	final int SPEED = 5;
@@ -354,9 +356,18 @@ public class Server {
             	if (new_id > -1)
             		tanks.remove(new_id);
             	clients--;
-                try { socket.close(); } 
-                catch (IOException e) {}
-                System.out.println("Closed: " + socket);
+            	
+				// kill tank
+				InputPacket tank_delete = new InputPacket(new_id, 0, 0, 0, false);
+				tank_delete.delete = true;
+				for (var client : sq) {
+					try {
+						client.writeObject(tank_delete);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
             }
         }
     }
