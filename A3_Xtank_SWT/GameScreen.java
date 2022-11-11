@@ -18,6 +18,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
@@ -208,50 +209,56 @@ public class GameScreen extends Screen {
 			color2 = SWT.COLOR_GRAY;
 		}
 		
-		canvas.addPaintListener(event -> {
-			// render bullets before transformation for tanks
-			List<Bullet> bullets = cModel.getBullets();
-			for (var bullet : bullets) {
-				Rectangle bullet_body = new Rectangle((int)bullet.getX(), (int)bullet.getY(), Bullet.size, Bullet.size);
-				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
-				event.gc.fillRectangle(bullet_body);
-			}
-			//Tank tank = cModel.getTank();
-			Map<Integer, Tank> tanks = cModel.getTanks();
-			for (var key : tanks.keySet()) {
-				
-				// get tank info
-				Tank tank = tanks.get(key);
-				Rectangle tank_body = new Rectangle(tank.getX(), tank.getY(), tank.width, tank.height);
-				Transform transform = new Transform(display);
-				
-				// move tank
-				transform.translate(tank.getX() + (tank.width / 2), tank.getY() + (tank.height / 2));
-				transform.rotate(-(float)tank.getRotate() + 90.0f);
-				transform.translate(-tank.getX() - (tank.width / 2), -tank.getY() - (tank.height / 2));
-				event.gc.setTransform(transform);
-				
-				// draw main rectangle
-				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color1));
-				event.gc.fillRectangle(tank_body);
-				
-				// draw circle thing
-				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color2));
-				event.gc.fillOval(tank.getX(), tank.getY()+(tank.width/2), tank.width, tank.width);
-				
-				// draw line
-				event.gc.setLineWidth(4);
-				event.gc.setForeground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_BLACK));
-				event.gc.drawLine(tank.getX()+(tank.width/2), tank.getY()+(tank.width/2), tank.getX()+(tank.width/2), tank.getY()-15);
-
-				// draw id
-				event.gc.setForeground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-				event.gc.drawText(String.valueOf(tank.getID()), tank.getX() + 10, tank.getY()+(tank.width/2));
-				map.collision(tank.getX(), tank.getY(), tank.getX() + tank.height, tank.getY() + tank.height);
-			}
-		});
+		canvas.addPaintListener(event -> paint(event));
 		
 		plHeader.setText("You are\nplayer:\n" + tankID);
+	}
+
+	private void paint(PaintEvent event) {
+		// render bullets before transformation for tanks
+		List<Bullet> bullets = cModel.getBullets();
+		for (var bullet : bullets) {
+			Rectangle bullet_body = new Rectangle((int)bullet.getX(), (int)bullet.getY(), Bullet.size, Bullet.size);
+			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+			event.gc.fillRectangle(bullet_body);
+		}
+		//Tank tank = cModel.getTank();
+		Map<Integer, Tank> tanks = cModel.getTanks();
+		for (var key : tanks.keySet()) {
+			
+			// get tank info
+			Tank tank = tanks.get(key);
+			int x = tank.getX();
+			int y = tank.getY();
+			int w = Tank.width;
+			int h = Tank.height;
+			Rectangle tank_body = new Rectangle(x, y, w, h);
+			Transform transform = new Transform(composite.getDisplay());
+			
+			// move tank
+			transform.translate(x + (w / 2), y + (h / 2));
+			transform.rotate(-(float)tank.getRotate() + 90.0f);
+			transform.translate(-x - (w / 2), -y - (h / 2));
+			event.gc.setTransform(transform);
+			
+			// draw main rectangle
+			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color1));
+			event.gc.fillRectangle(tank_body);
+			
+			// draw circle thing
+			event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color2));
+			event.gc.fillOval(x, y+(w/2), w, w);
+			
+			// draw line
+			event.gc.setLineWidth(4);
+			event.gc.setForeground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+			event.gc.drawLine(x+(w/2), y+(w/2), x+(w/2), y-15);
+
+			// draw id
+			event.gc.setForeground(compositeGame.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			event.gc.drawText(String.valueOf(tank.getID()), x + 10, y+(w/2));
+			map.collision(x, y, x + h, y + h);
+		}
 	}
 	
 	/**
