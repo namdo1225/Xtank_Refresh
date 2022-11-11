@@ -351,7 +351,7 @@ public class GameScreen extends Screen {
 		public void run() {
 			while (!canvas.isDisposed()) {
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

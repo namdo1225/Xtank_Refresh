@@ -2,6 +2,9 @@
  * A class to that represents packaged information that can be sent
  * back and forth from the client and server.
  * 
+ * This is supposed to be a C++ struct. Hence, the member variables
+ * are public.
+ * 
  * @author	Patrick Comden
  * @version	1.0
  * @since	2022-11-12

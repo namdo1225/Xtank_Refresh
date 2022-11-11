@@ -126,18 +126,21 @@ public class Server {
 				bullet_lock.lock();
 				for (int i = 0; i < bullets.size(); i++) {
 					if (!bullets.get(i).step()) {
-						bullets.remove(i);
-						i--;
 						// remove bullet from clients
 						for (var client : sq) {
-							InputPacket bullet_update = new InputPacket(i + 1, 0, 0, 0, true);
+							InputPacket bullet_update = new InputPacket(i, 0, 0, 0, true);
 							bullet_update.is_bullet = true;
+							bullet_update.delete = true;
 							try {
 								client.writeObject(bullet_update);
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
 						}
+						
+						bullets.remove(i);
+						i--;
+
 					}
 					else {
 						boolean deleted = false;
