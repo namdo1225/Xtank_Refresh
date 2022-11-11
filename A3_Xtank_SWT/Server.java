@@ -191,7 +191,7 @@ public class Server
 								}
 								else {
 									if (lives != tanks.get(key).getLives()) {
-										tanks.get(key).set(initial_x, initial_y, initial_angle);
+										tanks.get(key).set(initial_x, initial_y, initial_angle, tanks.get(key).getArmor());
 										for (var client : sq) {
 											InputPacket tank_reset = new InputPacket(key, initial_x, initial_y, initial_angle, false);
 											try {
@@ -265,16 +265,30 @@ public class Server
             try 
             {
             	out = new ObjectOutputStream(socket.getOutputStream());
+            	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             	out.flush();
             	
             	new_id = getNewID();
-            	System.out.println("Adding new tank: " + new_id);
             	out.writeObject(map.getID());
+            	int armor_type = (Integer)in.readObject();
+            	System.out.println("Model: " + armor_type);
+            	int tank_armor = 0;
+            	switch (armor_type) {
+            	case 0:
+            	case 1:
+            		tank_armor = 3;
+            		break;
+            	case 2:
+            		tank_armor = 2;
+            		break;
+            	}
                 // add new tank
-            	out.writeObject(new InputPacket(new_id, initial_x, initial_y, initial_angle, false));
+            	InputPacket initial_tank = new InputPacket(new_id, initial_x, initial_y, initial_angle, false);
+            	initial_tank.armor = tank_armor;
+            	out.writeObject(initial_tank);
             	for (var client : sq) {
             		if (client != out)
-            			client.writeObject(new InputPacket(new_id, initial_x, initial_y, initial_angle, false));
+            			client.writeObject(initial_tank);
             	}
             	// send num of tanks
             	out.writeObject(tanks.size());
@@ -282,12 +296,13 @@ public class Server
             	for (var key : tanks.keySet()) {
             		InputPacket packet = new InputPacket(tanks.get(key).getID(),
             				tanks.get(key).getX(), tanks.get(key).getX(), tanks.get(key).getRotate(), false);
+            		packet.armor = tanks.get(key).getArmor();
             		out.writeObject(packet);
             	}
             	//System.out.println(3);
-            	tanks.put(new_id, new Tank(initial_x, initial_y, new_id, max_lives, 2));
-            	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+            	tanks.put(new_id, new Tank(initial_x, initial_y, new_id, max_lives, tank_armor));
             	
+            	System.out.println(tanks.get(new_id).getArmor() + " asfsdgf sdgregyregt");
             	//System.out.println(4);
             	
                 sq.add(out);

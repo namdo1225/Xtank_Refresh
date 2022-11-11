@@ -92,8 +92,7 @@ public class ClientModel {
         	out.flush();
         	try {
         		int map_id = (Integer)in.readObject();
-        		// Somehow change GameMap here
-        		        		
+        		out.writeObject(tankModel);   		
         		new_tank = (InputPacket)in.readObject();
         		clientView.recreateGameScreen(map_id, tankModel, new_tank.id);
 
@@ -103,7 +102,7 @@ public class ClientModel {
         			InputPacket enemy_tank = (InputPacket)in.readObject();
         			System.out.println("Adding enemy: " + enemy_tank.id);
         			tanks.put(enemy_tank.id, new Tank(0, 0, enemy_tank.id));
-        			tanks.get(enemy_tank.id).set(enemy_tank.x, enemy_tank.y, enemy_tank.angle);
+        			tanks.get(enemy_tank.id).set(enemy_tank.x, enemy_tank.y, enemy_tank.angle, enemy_tank.armor);
         		}
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -274,7 +273,7 @@ public class ClientModel {
 						InputPacket packet = null;
 						try {
 							packet = (InputPacket)in.readObject();
-							System.out.println(in + " " + packet.id + " " + tank.getID());
+							//System.out.println(in + " " + packet.id + " " + tank.getID());
 						} catch (ClassNotFoundException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -304,15 +303,15 @@ public class ClientModel {
 							else {
 								// used if new tank added after this local tank was added
 								if (packet.id == tank.getID()) {
-									tank.set(packet.x, packet.y, packet.angle);
-									tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+									tank.set(packet.x, packet.y, packet.angle, packet.armor);
+									tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
 								}
 								else if (!tanks.containsKey(packet.id)) {
 									tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id));
-									tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+									tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
 								}
 								else {
-									tanks.get(packet.id).set(packet.x, packet.y, packet.angle);
+									tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
 								}
 							}
 						}

@@ -70,10 +70,11 @@ public class Tank {
 	 * @param y			an int for the tank's y position.
 	 * @param rotate	an int for the tank's rotation.
 	 */
-	public void set(int x, int y, int rotate) {
+	public void set(int x, int y, int rotate, int armor) {
 		this.x = x;
 		this.y = y;
 		this.rotate = rotate;
+		this.armor = armor;
 	}
 	
 	/**
@@ -186,6 +187,7 @@ public class Tank {
 	 * @return a boolean for whether the tank is still alive.
 	 */
 	public boolean hit() {
+		System.out.println("Tank " + id + " is hit, armor is now " + (armor - 1));
 		armor--;
 		if (armor <= 0) {
 			lives--;
