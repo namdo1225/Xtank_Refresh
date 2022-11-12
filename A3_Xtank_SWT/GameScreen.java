@@ -50,6 +50,9 @@ public class GameScreen extends Screen {
 	private int				color2;
 	private int				color3;
 	
+    private long 			time;
+    private long 			start;
+	
 	private	ExecutorService	redrawThread;
 
 	/**
@@ -134,9 +137,19 @@ public class GameScreen extends Screen {
 			public void mouseDoubleClick(MouseEvent e) {} 
 		});
 
+		
+		time = 0;
+		start = System.nanoTime() / 1000000;
 		canvas.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
-				if (isConnected()) {
+            	time = (System.nanoTime() / 1000000) - start;
+				
+				if (isConnected() && time > 2000) {
+					System.out.println("input");
+					
+        			start = System.nanoTime() / 1000000;
+        			time = 0;
+					
 					int tankID = cModel.getTank().getID();
 					InputPacket packet = new InputPacket(tankID);
 					
