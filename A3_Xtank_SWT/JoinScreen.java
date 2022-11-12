@@ -161,6 +161,7 @@ public class JoinScreen extends Screen {
 		compositeJoin.setEnabled(false);
 		compositeTank.setEnabled(true);
 		selectTank.setText("Continue");
+		error.setText("");
 		cControl.updateScreen(Mode.MAIN);
 	}
 	
