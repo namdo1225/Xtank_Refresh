@@ -129,14 +129,12 @@ public class ClientController {
 	/**
 	 * A method to write a data packet out to the server.
 	 * 
-	 * @param packet		an InputPacket that packs many different member
-	 * 						variable to be sent to the server together.
+	 * @param packet	an InputPacket that packs many different member
+	 * 					variable to be sent to the server together.
 	 */
 	public void writeOut(InputPacket packet) {
 		try { clientModel.getOutput().writeObject(packet); }
-		catch (IOException e) {
-			System.out.println("The server did not respond (write KL).");
-		}
+		catch (IOException e) {}
 	}
 	
 	/**

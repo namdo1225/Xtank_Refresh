@@ -130,7 +130,6 @@ public class Tank {
 	 * @param speed	an int for the tank's speed.
 	 */
 	public void moveForward(int speed) {
-		//System.out.println(getDirectionX() + " " + getDirectionY());
 		this.x += (float)getDirectionX() * (float)speed;
 		this.y -= (float)getDirectionY() * (float)speed;
 	}

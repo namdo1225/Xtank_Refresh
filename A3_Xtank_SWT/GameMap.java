@@ -51,7 +51,7 @@ public class GameMap {
 	/**
 	 * A constructor for GameMap. Meant to be used by the server.
 	 * 
-	 * @param mapNum		an int to load the correct map for the GameMap screen.
+	 * @param mapNum	an int to load the correct map for the GameMap screen.
 	 */
 	public GameMap(int mapNum) {
 		id = mapNum;

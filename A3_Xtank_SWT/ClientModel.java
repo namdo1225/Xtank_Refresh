@@ -87,7 +87,7 @@ public class ClientModel {
 	 * A setter to set the screen mode, allowing the model to change
 	 * the UI for the view.
 	 * 
-	 * @param m		a Mode emum representing the correct screen mode.
+	 * @param m			a Mode emum representing the correct screen mode.
 	 */
 	public void setMode(Mode m) {
 		mode = m;
@@ -312,8 +312,8 @@ public class ClientModel {
 		/**
 		 * A method to handle bullet packet received from the server.
 		 * 
-		 * @param packet	an InputPacket object packed with data received
-		 * 					from the server.
+		 * @param packet		an InputPacket object packed with data received
+		 * 						from the server.
 		 */
 		private void handleBullet(InputPacket packet) {
 			// new bullet
@@ -333,8 +333,8 @@ public class ClientModel {
 		/**
 		 * A method to handle tank packet received from the server.
 		 * 
-		 * @param packet	an InputPacket object packed with data received
-		 * 					from the server.
+		 * @param packet		an InputPacket object packed with data received
+		 * 						from the server.
 		 */
 		private void handleTank(InputPacket packet) {
 			clientLock.lock();
@@ -352,7 +352,6 @@ public class ClientModel {
 				}
 				else if (!tanks.containsKey(packet.id)) {
 					tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id, packet.armor));
-					System.out.println("New tank added. Armor: " + packet.armor);
 					tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
 				}
 				else {

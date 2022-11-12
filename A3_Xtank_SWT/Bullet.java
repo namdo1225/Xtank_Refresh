@@ -18,10 +18,10 @@ public class Bullet {
 	/**
 	 * Constructor for the Bullet class.
 	 * 
-	 * @param x		a float for the bullet's x position.
-	 * @param y		a float for the bullet's y position.
-	 * @param angle	an int for the angle the bullet is traveling to.
-	 * @param speed	an int for the bullet's speed.
+	 * @param x			a float for the bullet's x position.
+	 * @param y			a float for the bullet's y position.
+	 * @param angle		an int for the angle the bullet is traveling to.
+	 * @param speed		an int for the bullet's speed.
 	 */
 	public Bullet(float x, float y, int angle, int speed) {
 		this.x = x;
@@ -33,7 +33,7 @@ public class Bullet {
 	/**
 	 * A getter to return the bullet's x position.
 	 * 
-	 * @return x	a float for the bullet's x position.
+	 * @return x		a float for the bullet's x position.
 	 */
 	public float getX() {
 		return x;
@@ -42,7 +42,7 @@ public class Bullet {
 	/**
 	 * A getter to return the bullet's y position.
 	 * 
-	 * @return y	a float for the bullet's y position.
+	 * @return y		a float for the bullet's y position.
 	 */
 	public float getY() {
 		return y;
@@ -51,7 +51,7 @@ public class Bullet {
 	/**
 	 * A getter to return the angle the bullet is travelling on.
 	 * 
-	 * @return angle	an int for the bullet's angle.
+	 * @return	an int for the bullet's angle.
 	 */
 	public int getAngle() {
 		return angle;
@@ -101,8 +101,8 @@ public class Bullet {
 	/**
 	 * A method to set the bullet's position.
 	 * 
-	 * @param x		a float for the bullet's new x.
-	 * @param y		a float for the bullet's new y.
+	 * @param x			a float for the bullet's new x.
+	 * @param y			a float for the bullet's new y.
 	 */
 	public void set(float x, float y) {
 		this.x = x;
