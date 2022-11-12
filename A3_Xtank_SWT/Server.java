@@ -27,6 +27,8 @@ public class Server {
 	private static List<Bullet>						bullets;
 
 	private static ServerSocket						listener;
+	private static List<Socket>						sockets;
+	
 	private static ExecutorService					pool;
 	
 	private static ExecutorService					bullet_thread;
@@ -51,6 +53,9 @@ public class Server {
     	clients = 0;
 		sq = new ArrayList<ObjectOutputStream>();
 		tanks = new HashMap<Integer, Tank>();
+		
+		sockets = new ArrayList<Socket>();
+		
 		bullets = new ArrayList<Bullet>();
 		map = new GameMap(mapNum);
 		Server.max_lives = max_lives;
@@ -103,7 +108,26 @@ public class Server {
     	
     	if (pool != null)
     		pool.shutdown();
-    	if (pool != null)
+    	if (bullet_thread != null)
+    		bullet_thread.shutdown();
+    	clients = 0;
+    }
+    
+    private static void closeServeMisc() {
+    	try {
+        	if (listener != null)
+        		listener.close();
+		} catch (IOException e) {}
+    	
+    	for (Socket socket : sockets)
+			try {
+				socket.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	
+    	if (bullet_thread != null)
     		bullet_thread.shutdown();
     	clients = 0;
     }
@@ -185,6 +209,8 @@ public class Server {
 											for (var client : sq) {
 												try {
 													client.writeObject(winner_packet);
+													
+													
 												} catch (IOException e) {
 													// TODO Auto-generated catch block
 													e.printStackTrace();
@@ -193,6 +219,9 @@ public class Server {
 											
 											break;
 										}
+										
+										closeServeMisc();
+										return;
 									}
 									
 									tank_lock.unlock();
@@ -383,6 +412,7 @@ public class Server {
                 System.out.println("Error:" + socket);
             } 
             finally {
+            	sockets.remove(socket);
             	sq.remove(out);
             	if (new_id > -1)
             		tanks.remove(new_id);
@@ -429,6 +459,7 @@ public class Server {
         	while (true) {
                 try {
                 	socket = listener.accept();
+                	sockets.add(socket);
             		clients++;
 
             		ExecutorService poolTest = Executors.newFixedThreadPool(5);
@@ -438,5 +469,3 @@ public class Server {
         }
     }
 }
-
-
