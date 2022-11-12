@@ -144,10 +144,7 @@ public class GameScreen extends Screen {
 			public void keyPressed(KeyEvent e) {
             	time = (System.nanoTime() / 1000000) - start;
 				
-				if (isConnected() && time > 2000) {
-        			start = System.nanoTime() / 1000000;
-        			time = 0;
-					
+				if (isConnected()) {
 					int tankID = cModel.getTank().getID();
 					InputPacket packet = new InputPacket(tankID);
 					
@@ -171,7 +168,13 @@ public class GameScreen extends Screen {
 						break;
 					}
 
-					cControl.writeOut(packet);
+					if (!packet.shoot || (time > 2000 && packet.shoot)) {
+						if (packet.shoot) {
+							start = System.nanoTime() / 1000000;
+							time = 0;
+						}
+						cControl.writeOut(packet);
+					}
 					canvas.redraw();
 				}
 			}
