@@ -7,7 +7,7 @@
  * Pattern: Model for the client from the MVC.
  * 			Singleton pattern.
  * 
- * @author	Nam Do
+ * @author	Patrick Comden
  * @version	1.0
  * @since	2022-11-12
  */
@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ClientModel {
 	private static ClientModel			model;
@@ -34,7 +36,7 @@ public class ClientModel {
 	private	static Socket				socket;
 	private static ObjectInputStream 	in;
 	private static ObjectOutputStream 	out;
-	private static InputPacket			new_tank;
+	private static InputPacket			newTank;
 	
 	private static Tank					tank;
 	
@@ -43,6 +45,7 @@ public class ClientModel {
 	
 	private static Runner				runnable;
 	private static ExecutorService		pool;
+	private static Lock 				clientLock;
 	
 	private	int							tankModel;
 	private boolean						terminate;
@@ -52,6 +55,7 @@ public class ClientModel {
 	 * Private constructor for ClientModel.
 	 */
 	private ClientModel() {
+		clientLock = new ReentrantLock();
 		winner = -1;
 		mode = Mode.MAIN;
 		tanks = new HashMap<>();
@@ -65,9 +69,8 @@ public class ClientModel {
 	 * @return	a ClientModel object.
 	 */
 	public synchronized static ClientModel get() {
-		if (model == null) {
+		if (model == null)
 			model = new ClientModel();
-		}
 		return model;
 	}
 	
@@ -84,7 +87,7 @@ public class ClientModel {
 	 * A setter to set the screen mode, allowing the model to change
 	 * the UI for the view.
 	 * 
-	 * @param m		a Mode enum representing the correct screen mode.
+	 * @param m		a Mode emum representing the correct screen mode.
 	 */
 	public void setMode(Mode m) {
 		mode = m;
@@ -101,37 +104,37 @@ public class ClientModel {
 		terminate = false;
 		
 		try {
-        	socket = new Socket();
-        	socket.connect(new InetSocketAddress(ip, port), 100);
-        	
-        	in = new ObjectInputStream(socket.getInputStream());
-        	out = new ObjectOutputStream(socket.getOutputStream());
-        	out.flush();
-        	try {
-        		int map_id = (Integer)in.readObject();
-        		out.writeObject(tankModel);   		
-        		new_tank = (InputPacket)in.readObject();
-        		clientView.recreateGameScreen(map_id, tankModel, new_tank.id);
+			socket = new Socket();
+			socket.connect(new InetSocketAddress(ip, port), 100);
 
-        		
-        		int num_tanks = (Integer)in.readObject();
-        		for (int i = 0; i < num_tanks; i++) {
-        			InputPacket enemy_tank = (InputPacket)in.readObject();
-        			System.out.println("Adding enemy: " + enemy_tank.id);
-        			tanks.put(enemy_tank.id, new Tank(enemy_tank.x, enemy_tank.y, enemy_tank.id, enemy_tank.armor));
-        			tanks.get(enemy_tank.id).set(enemy_tank.x, enemy_tank.y, enemy_tank.angle, enemy_tank.armor);
-        		}
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			// Setup input/output stream from and to server.
+			in = new ObjectInputStream(socket.getInputStream());
+			out = new ObjectOutputStream(socket.getOutputStream());
+			out.flush();
+			
+			// read map data and enemy players' tanks.
+			int map_id = (Integer)in.readObject();
+			out.writeObject(tankModel);   		
+			newTank = (InputPacket)in.readObject();
+			clientView.recreateGameScreen(map_id, tankModel, newTank.id);
+
+			int num_tanks = (Integer)in.readObject();
+			for (int i = 0; i < num_tanks; i++) {
+				InputPacket enemy_tank = (InputPacket)in.readObject();
+				tanks.put(enemy_tank.id, new Tank(enemy_tank.x, enemy_tank.y, enemy_tank.id, enemy_tank.armor));
+				tanks.get(enemy_tank.id).set(enemy_tank.x, enemy_tank.y, enemy_tank.angle, enemy_tank.armor);
 			}
-        	tank = new Tank(new_tank.x, new_tank.y, new_tank.id, new_tank.armor);
-        	tanks.put(tank.getID(), tank);
-        }
-        catch (Exception e) {
-        	//System.out.println("error");
-        }
+
+			tank = new Tank(newTank.x, newTank.y, newTank.id, newTank.armor);
+			tanks.put(tank.getID(), tank);
+        } catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
         
+		// if socket is connected to the server, create a thread to handle server/client input/output.
         if (socket.isConnected()) {        	
         	runnable = new Runner();
         	pool = Executors.newFixedThreadPool(1);
@@ -275,7 +278,7 @@ public class ClientModel {
 	 * A Runnable derived class that represents the task of
 	 * getting input and output from the server.
 	 * 
-	 * @author	Nam Do
+	 * @author	Patrick Comden
 	 * @version	1.0
 	 * @since	2022-11-12
 	 */
@@ -284,8 +287,6 @@ public class ClientModel {
 		/**
 		 * A method to run the task, which is to get input and output
 		 * from the server.
-		 * 
-		 * @author Patrick Comden
 		 */
 		@Override
 		public void run() {
@@ -296,54 +297,18 @@ public class ClientModel {
 						InputPacket packet = null;
 						try {
 							packet = (InputPacket)in.readObject();
-							//System.out.println(in + " " + packet.id + " " + tank.getID());
 						} catch (ClassNotFoundException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						if (packet.is_bullet) {
-							// new bullet
-							if (packet.id >= bullets.size()) {
-								bullets.add(new Bullet(packet.x, packet.y, 0, 0));
-							}
-							// update bullet
-							else {
-								bullets.get(packet.id).set(packet.x, packet.y);
-							}
-							// delete bullet
-							if (packet.delete) {
-								bullets.remove(packet.id);
-							}
-						}
-						else {
-							Tank.client_lock.lock();
-							if (packet.x == -69 && packet.y == -69 && packet.angle == -69) {
-								winner = packet.id;								
-							}
-							if (packet.delete) {
-								tanks.remove(packet.id);
-							}
-							else {
-								// used if new tank added after this local tank was added
-								if (packet.id == tank.getID()) {
-									tank.set(packet.x, packet.y, packet.angle, packet.armor);
-									tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
-								}
-								else if (!tanks.containsKey(packet.id)) {
-									tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id, packet.armor));
-									System.out.println("New tank added. Armor: " + packet.armor);
-									tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
-								}
-								else {
-									tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
-								}
-							}
-							Tank.client_lock.unlock();
-						}
+						
+						if (packet.isBullet)
+							handleBullet(packet);
+						else
+							handleTank(packet);
 					}
 				}
 				catch(IOException ex) {
-					//System.out.println("The server did not respond (async).");
+					System.out.println("The server did not respond (async).");
 					stop();
 				}
 				catch(NullPointerException ex) {
@@ -352,8 +317,60 @@ public class ClientModel {
 							+ "or other issue.");
 					stop();
 				}
-		        //display.timerExec(150, this);
 			}
+		}
+		
+		/**
+		 * A method to handle bullet packet received from the server.
+		 * 
+		 * @param packet	an InputPacket object packed with data received
+		 * 					from the server.
+		 */
+		private void handleBullet(InputPacket packet) {
+			// new bullet
+			if (packet.id >= bullets.size()) {
+				bullets.add(new Bullet(packet.x, packet.y, 0, 0));
+			}
+			// update bullet
+			else {
+				bullets.get(packet.id).set(packet.x, packet.y);
+			}
+			// delete bullet
+			if (packet.delete) {
+				bullets.remove(packet.id);
+			}
+		}
+		
+		/**
+		 * A method to handle tank packet received from the server.
+		 * 
+		 * @param packet	an InputPacket object packed with data received
+		 * 					from the server.
+		 */
+		private void handleTank(InputPacket packet) {
+			clientLock.lock();
+			if (packet.x == -69 && packet.y == -69 && packet.angle == -69) {
+				winner = packet.id;								
+			}
+			if (packet.delete) {
+				tanks.remove(packet.id);
+			}
+			else {
+				// used if new tank added after this local tank was added
+				if (packet.id == tank.getID()) {
+					tank.set(packet.x, packet.y, packet.angle, packet.armor);
+					tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
+				}
+				else if (!tanks.containsKey(packet.id)) {
+					tanks.put(packet.id, new Tank(packet.x, packet.y, packet.id, packet.armor));
+					System.out.println("New tank added. Armor: " + packet.armor);
+					tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
+				}
+				else {
+					tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
+				}
+			}
+			clientLock.unlock();
 		}
 		
 		/**

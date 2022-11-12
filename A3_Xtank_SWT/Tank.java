@@ -1,8 +1,3 @@
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.eclipse.swt.SWT;
-
 /**
  * A class to represent the tank of the game.
  * 
@@ -11,6 +6,8 @@ import org.eclipse.swt.SWT;
  * @since	2022-11-12
  */
 
+import org.eclipse.swt.SWT;
+
 public class Tank {
 	private float			x;
 	private float			y;
@@ -18,11 +15,10 @@ public class Tank {
 	private int				id;
 	private int				lives;
 	private int				armor;
-	private int 			default_armor;
-	private int 			shoot_speed;
+	private int 			defaultArmor;
+	private int 			shootSpeed;
 	
 	private boolean			armorExist;
-	private boolean			firstSet;
 	
 	private int				tankBody;
 	private int				tankRotatorAndCannon;
@@ -31,7 +27,6 @@ public class Tank {
 	
 	public static final int width = 25;
 	public static final int height = 50;
-	public static Lock client_lock = new ReentrantLock();
 	
 	/**
 	 * The first constructor for Tank.
@@ -47,9 +42,8 @@ public class Tank {
 		this.rotate = 0;
 		this.id = id;
 		this.armor = armor;
-		this.default_armor = armor;
+		this.defaultArmor = armor;
 		armorExist = false;
-		firstSet = true;
 		setColorScheme();
 	}
 	
@@ -69,7 +63,7 @@ public class Tank {
 		this.id = id;
 		this.lives = lives;
 		this.armor = armor;
-		this.default_armor = armor;
+		this.defaultArmor = armor;
 		armorExist = false;
 		setColorScheme();
 	}
@@ -83,7 +77,7 @@ public class Tank {
 		tankRotatorAndCannon = SWT.COLOR_BLACK;
 		tankShield = SWT.COLOR_DARK_BLUE;
 		
-		if (default_armor == 2) {
+		if (defaultArmor == 2) {
 			tankBody = SWT.COLOR_DARK_RED;
 			tankRotatorAndCannon = SWT.COLOR_GRAY;
 			tankShield = SWT.COLOR_DARK_YELLOW;
@@ -154,7 +148,6 @@ public class Tank {
 		this.y = y;
 		this.rotate = rotate;
 		this.armor = armor;
-		System.out.println(armor);
 	}
 	
 	/**
@@ -246,11 +239,11 @@ public class Tank {
 	
 	
 	public void setShootSpeed(int shoot_speed) {
-		this.shoot_speed = shoot_speed;
+		this.shootSpeed = shoot_speed;
 	}
 	
 	public int getShootSpeed() {
-		return shoot_speed;
+		return shootSpeed;
 	}
 	/**
 	 * Returns true if box collides with tank.

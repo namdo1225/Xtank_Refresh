@@ -121,21 +121,12 @@ public class GameMap {
 	 * @return	a boolean. true if collision occurs. false if not.
 	 */
 	public boolean collision(int x1, int y1, int x2, int y2) {
-		for (int i = 0; i < x.length; i++) {
+		for (int i = 0; i < x.length; i++)
 			if (x1 < x[i] + w[i] &&
 				x2 > x[i] &&
 				y1 < y[i] + h[i] &&
 				y2 > y[i])
-			{
-				//System.out.println("collision " + x1 + " " + y1);
 				return true;
-			}
-		}
-		// outside bounds
-		if (x1 < 0 || x2 > 800 || y1 < 0 || y2 > 800) {
-			//return true;
-		}
-		
 		return false;
 	}
 }

@@ -139,6 +139,9 @@ public class GameScreen extends Screen {
 				if (isConnected()) {
 					int tankID = cModel.getTank().getID();
 					InputPacket packet = new InputPacket(tankID);
+					
+					// set up an object/packet to send to server based
+					// on player's input.
 					switch (e.keyCode) {
 					case SWT.ARROW_UP:
 						packet.y = -1;
@@ -156,11 +159,6 @@ public class GameScreen extends Screen {
 						packet.shoot = true;
 						break;
 					}
-					
-					//System.out.println("key " + e.character);
-					// update tank location
-					//x += directionX;
-					//y += directionY;
 
 					cControl.writeOut(packet);
 					canvas.redraw();
@@ -175,7 +173,6 @@ public class GameScreen extends Screen {
 		GridData data = new GridData();
 		data.horizontalSpan = 1;
 		data.grabExcessVerticalSpace = true;
-		//data.verticalAlignment = GridData.FILL;
 		data.heightHint = 400;
 		compositePlayer.setLayoutData(data);
 		
@@ -206,6 +203,12 @@ public class GameScreen extends Screen {
 		plHeader.setText("You are\nplayer:\n" + tankID);
 	}
 
+	/**
+	 * A method to paint to the SWT canvas.
+	 * 
+	 * @param event		a PaintEvent object to get more information about the
+	 * 					event that the player created.
+	 */
 	private void paint(PaintEvent event) {
 		// render bullets before transformation for tanks
 		List<Bullet> bullets = cModel.getBullets();
@@ -215,8 +218,6 @@ public class GameScreen extends Screen {
 			event.gc.fillRectangle(bullet_body);
 		}
 		
-		//Tank tank = cModel.getTank();
-		Tank.client_lock.lock();
 		Map<Integer, Tank> tanks = cModel.getTanks();
 		for (var key : tanks.keySet()) {
 			
@@ -264,7 +265,6 @@ public class GameScreen extends Screen {
 			event.gc.drawText(String.valueOf(tank.getID()), x + 10, y+(w/2));
 			map.collision(x, y, x + h, y + h);
 		}
-		Tank.client_lock.unlock();
 	}
 	
 	/**
@@ -330,8 +330,8 @@ public class GameScreen extends Screen {
 	 * A method to end the game, cleaning up the UI and returning to the title screen.
 	 */
 	public void endGame() {
-		serverStatus.setText("Server\nACTIVE");
 		serverStatus.setForeground(compositePlayer.getDisplay().getSystemColor(SWT.COLOR_GREEN));
+		serverStatus.setText("Server\nACTIVE");
 		cControl.endGame();
 		cControl.updateScreen(Mode.MAIN);
 	}

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Server {
-	private static List<ObjectOutputStream> 		sq;
+	private static List<ObjectOutputStream> 		outs;
 	private static Map<Integer, Tank>				tanks;
 	private static List<Bullet>						bullets;
 
@@ -31,14 +31,14 @@ public class Server {
 	
 	private static ExecutorService					pool;
 	
-	private static ExecutorService					bullet_thread;
-	private static Lock								bullet_lock;
-	private static Lock								tank_lock;
+	private static ExecutorService					bulletThread;
+	private static Lock								bulletLock;
+	private static Lock								tankLock;
 	private static GameMap							map;
-	private static int								max_lives;
-	private static final int						initial_x = 50;
-	private static final int 						initial_y = 50;
-	private static final int						initial_angle = 0;
+	private static int								maxLives;
+	private static final int						initialX = 50;
+	private static final int 						initialY = 50;
+	private static final int						initialAng = 0;
 	
     private static int								clients;
 	
@@ -48,28 +48,27 @@ public class Server {
 	 * @param port		an int for the port number.
 	 * @param mapNum	an int for the maze map's id.
 	 */
-    public Server(int port, int mapNum, int max_lives) {
-		//System.out.println(InetAddress.getLocalHost());
+    public Server(int port, int mapNum, int maxLives) {
     	clients = 0;
-		sq = new ArrayList<ObjectOutputStream>();
+    	
+    	outs = new ArrayList<ObjectOutputStream>();
 		tanks = new HashMap<Integer, Tank>();
-		
 		sockets = new ArrayList<Socket>();
-		
 		bullets = new ArrayList<Bullet>();
 		map = new GameMap(mapNum);
-		Server.max_lives = max_lives;
+		
+		Server.maxLives = maxLives;
 		Bullet.setMap(map);
+		
         try
         {
         	listener = new ServerSocket(port);
-            //System.out.println("The XTank server is running...");
-        	bullet_thread = Executors.newFixedThreadPool(1);
-        	bullet_lock = new ReentrantLock();
-        	tank_lock = new ReentrantLock();
+        	bulletThread = Executors.newFixedThreadPool(1);
+        	bulletLock = new ReentrantLock();
+        	tankLock = new ReentrantLock();
             pool = Executors.newFixedThreadPool(4);
             pool.execute(new XTankConnection());
-            bullet_thread.execute(new BulletManager());
+            bulletThread.execute(new BulletManager());
             
         } catch (Exception e) {}
     }
@@ -108,8 +107,8 @@ public class Server {
     	
     	if (pool != null)
     		pool.shutdown();
-    	if (bullet_thread != null)
-    		bullet_thread.shutdown();
+    	if (bulletThread != null)
+    		bulletThread.shutdown();
     	clients = 0;
     }
     
@@ -122,13 +121,10 @@ public class Server {
     	for (Socket socket : sockets)
 			try {
 				socket.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			} catch (IOException e) {}
     	
-    	if (bullet_thread != null)
-    		bullet_thread.shutdown();
+    	if (bulletThread != null)
+    		bulletThread.shutdown();
     	clients = 0;
     }
     
@@ -147,113 +143,32 @@ public class Server {
 		@Override
 		public void run() {
 			while (true) {
-				bullet_lock.lock();
+				bulletLock.lock();
 				for (int i = 0; i < bullets.size(); i++) {
 					if (!bullets.get(i).step()) {
-						// remove bullet from clients
-						for (var client : sq) {
-							InputPacket bullet_update = new InputPacket(i, 0, 0, 0, true);
-							bullet_update.is_bullet = true;
-							bullet_update.delete = true;
-							try {
-								client.writeObject(bullet_update);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-						
-						bullets.remove(i);
+						removeBulletWall(i);
 						i--;
-
 					}
 					else {
 						boolean deleted = false;
-						for (var key : tanks.keySet()) {
+						for (Integer key : tanks.keySet()) {
 							if (tanks.get(key).rectCollides(bullets.get(i).getX(), bullets.get(i).getY(),
 									bullets.get(i).getX() + Bullet.size, bullets.get(i).getY() + Bullet.size))
 							{
-								bullets.remove(i);
+								removeBulletWall(i);
 								i--;
-								// remove bullet from clients
-								for (var client : sq) {
-									InputPacket bullet_update = new InputPacket(i + 1, 0, 0, 0, false);
-									bullet_update.is_bullet = true;
-									bullet_update.delete = true;
-									try {
-										client.writeObject(bullet_update);
-									} catch (IOException e) {
-										e.printStackTrace();
-									}
-								}
+								
 								int lives = tanks.get(key).getLives();
 								if (!tanks.get(key).hit()) {
-									tank_lock.lock();
-									// kill tank
-									tanks.remove(key);
-									InputPacket tank_delete = new InputPacket(key, 0, 0, 0, false);
-									tank_delete.delete = true;
-									for (var client : sq) {
-										try {
-											client.writeObject(tank_delete);
-										} catch (IOException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										}
-									}
-									// check if there is winner
-									if (tanks.size() == 1) { 
-										for (var winner_id : tanks.keySet()) {
-											System.out.println("Winner!!! "  + winner_id);
-											// -69 is out of range, reserved for winner
-											InputPacket winner_packet = new InputPacket(winner_id, -69, -69, -69, false);
-											for (var client : sq) {
-												try {
-													client.writeObject(winner_packet);
-													
-													
-												} catch (IOException e) {
-													// TODO Auto-generated catch block
-													e.printStackTrace();
-												}
-											}
-											
-											break;
-										}
-										
-										closeServeMisc();
-										return;
-									}
-									
-									tank_lock.unlock();
+									playerIsHit(key);
+									closeServeMisc();
+									return;
 								}
 								else {
-									if (lives != tanks.get(key).getLives()) {
-										tanks.get(key).set(initial_x, initial_y, initial_angle, tanks.get(key).getArmor());
-										for (var client : sq) {
-											InputPacket tank_reset = new InputPacket(key, initial_x, initial_y, initial_angle, false);
-											try {
-												client.writeObject(tank_reset);
-											} catch (IOException e) {
-												e.printStackTrace();
-											}
-										}
-									}
-									else {
-										// update visual armor client-side
-										for (ObjectOutputStream o: sq)
-					                	{
-					                    	InputPacket to_client = new InputPacket(key, 
-					                    			tanks.get(key).getX(), tanks.get(key).getY(),
-					                    			tanks.get(key).getRotate(), false);
-					                    	to_client.armor = tanks.get(key).getArmor();
-					    					try {
-												o.writeObject(to_client);
-											} catch (IOException e) {
-												// TODO Auto-generated catch block
-												e.printStackTrace();
-											}
-					                	}
-									}
+									if (lives != tanks.get(key).getLives())
+										updatePlayerLives(key);
+									else
+										updateArmor(key);
 								}
 								deleted = true;
 								break;
@@ -261,26 +176,113 @@ public class Server {
 						}
 						if (deleted)
 							continue;
-						for (var client : sq) {
-							InputPacket bullet_update = new InputPacket(i, (int)bullets.get(i).getX(), (int)bullets.get(i).getY(),
+						for (ObjectOutputStream client : outs) {
+							InputPacket bulletUpdate = new InputPacket(i, (int)bullets.get(i).getX(),
+																		(int)bullets.get(i).getY(),
 																		0, false);
-							bullet_update.is_bullet = true;
+							bulletUpdate.isBullet = true;
 							try {
-								client.writeObject(bullet_update);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+								client.writeObject(bulletUpdate);
+							} catch (IOException e) {}
 						}
-						System.out.println(i + " " + bullets.get(i).getX() + " " + bullets.get(i).getY());
 					}
 				}
-				bullet_lock.unlock();
+				bulletLock.unlock();
 				try {
 					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+				} catch (InterruptedException e) {}
+			}
+		}
+		
+		/**
+		 * Remove a bullet from server and client.
+		 * 
+		 * @param i		an int representing the exact bullet to remove.
+		 */
+		private void removeBulletWall(int i) {
+			// remove bullet from clients
+			for (ObjectOutputStream client : outs) {
+				InputPacket bullet_update = new InputPacket(i, 0, 0, 0, true);
+				bullet_update.isBullet = true;
+				bullet_update.delete = true;
+				try {
+					client.writeObject(bullet_update);
+				} catch (IOException e) {}
+			}
+			
+			bullets.remove(i);
+		}
+    
+		/**
+		 * Handle an event where a player is hit by a bullet.
+		 * 
+		 * @param key	an Integer referring to the key in a map of Tank
+		 * 				objects.
+		 */
+		private void playerIsHit(Integer key) {
+			tankLock.lock();
+			
+			// kill tank
+			tanks.remove(key);
+			InputPacket tank_delete = new InputPacket(key, 0, 0, 0, false);
+			tank_delete.delete = true;
+			for (ObjectOutputStream client : outs) {
+				try {
+					client.writeObject(tank_delete);
+				} catch (IOException e) {}
+			}
+			
+			// check if there is winner
+			if (tanks.size() == 1) { 
+				for (var winner_id : tanks.keySet()) {
+					// -69 is out of range, reserved for winner
+					InputPacket winner_packet = new InputPacket(winner_id, -69, -69, -69, false);
+					for (ObjectOutputStream client : outs) {
+						try {
+							client.writeObject(winner_packet);
+						} catch (IOException e) {}
+					}
+					
+					break;
 				}
 			}
+			
+			tankLock.unlock();
+		}
+		
+		/**
+		 * Update players' lives and send the updated data to clients.
+		 * 
+		 * @param key	an Integer referring to the key in a map of Tank
+		 * 				objects.
+		 */
+		private void updatePlayerLives(Integer key) {
+			tanks.get(key).set(initialX, initialY, initialAng, tanks.get(key).getArmor());
+			for (ObjectOutputStream client : outs) {
+				InputPacket tank_reset = new InputPacket(key, initialX, initialY, initialAng, false);
+				try {
+					client.writeObject(tank_reset);
+				} catch (IOException e) {}
+			}
+		}
+		
+		/**
+		 * Update the armor visual on the client-side.
+		 * 
+		 * @param key	an Integer that acts as the key to a map of
+		 * 				Tank objects.
+		 */
+		private void updateArmor(Integer key) {
+			// update visual armor client-side
+			for (ObjectOutputStream o: outs) {
+            	InputPacket to_client = new InputPacket(key, 
+            			tanks.get(key).getX(), tanks.get(key).getY(),
+            			tanks.get(key).getRotate(), false);
+            	to_client.armor = tanks.get(key).getArmor();
+				try {
+					o.writeObject(to_client);
+				} catch (IOException e) {}
+        	}
 		}
     }
     
@@ -311,125 +313,157 @@ public class Server {
          */
         @Override
         public void run() {
-            System.out.println("Connected: " + socket);
             ObjectOutputStream out = null;
-            int new_id = -1;
+            int newID = -1;
             try {
             	out = new ObjectOutputStream(socket.getOutputStream());
             	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             	out.flush();
             	
-            	new_id = getNewID();
+            	newID = getNewID();
             	out.writeObject(map.getID());
-            	int armor_type = (Integer)in.readObject();
-            	System.out.println("Model: " + armor_type);
-            	int tank_armor = 0;
-            	int shoot_speed = 0;
-            	switch (armor_type) {
+            	
+            	int armType = (Integer)in.readObject();
+            	int tankArm = 0;
+            	int shootSpd = 0;
+            	switch (armType) {
             	case 1:
-            		tank_armor = 3;
-            		shoot_speed = 10;
+            		tankArm = 3; shootSpd = 10;
             		break;
             	case 2:
-            		tank_armor = 2;
-            		shoot_speed = 20;
+            		tankArm = 2; shootSpd = 20;
             		break;
             	}
-                // add new tank
-            	InputPacket initial_tank = new InputPacket(new_id, initial_x, initial_y, initial_angle, false);
-            	initial_tank.armor = tank_armor;
-            	out.writeObject(initial_tank);
-            	for (var client : sq) {
-            		if (client != out)
-            			client.writeObject(initial_tank);
-            	}
-            	// send num of tanks
-            	out.writeObject(tanks.size());
-            	// loop through all tanks and send
-            	for (var key : tanks.keySet()) {
-            		InputPacket packet = new InputPacket(tanks.get(key).getID(),
-            				tanks.get(key).getX(), tanks.get(key).getY(), tanks.get(key).getRotate(), false);
-            		packet.armor = tanks.get(key).getArmor();
-            		out.writeObject(packet);
-            	}
-            	//System.out.println(3);
-            	tanks.put(new_id, new Tank(initial_x, initial_y, new_id, max_lives, tank_armor));
-            	tanks.get(new_id).setShootSpeed(shoot_speed);
-            	System.out.println(tanks.get(new_id).getArmor() + " asfsdgf sdgregyregt");
-            	//System.out.println(4);
+
+            	addNewTank(newID, tankArm, shootSpd, out);
             	
-                sq.add(out);
-                //System.out.println(5);
+                outs.add(out);
+                
                 // send old tanks to new tank
                 long time = 0;
                 long start = System.nanoTime() / 1000000;
                 while (!socket.isClosed()) {
                 	InputPacket input = (InputPacket)in.readObject();
+                	
                 	// update tank position server side
                 	final int SPEED = 5;
-                	tank_lock.lock();
+                	tankLock.lock();
                 	if (tanks.containsKey(input.id)) {
 	                	Tank tank = tanks.get(input.id);
 	                	tank.rotate(-input.x * SPEED);
-	                	//System.out.println(tanks.get(input.id).getRotate());
 	                	tanks.get(input.id).moveForward(-input.y * SPEED);
-	                	if (map.collision(tanks.get(input.id).getX(),
-	            			tanks.get(input.id).getY(),
-	            			tanks.get(input.id).getX() + (Tank.width),
-	            			tanks.get(input.id).getY() + (Tank.height)))
-	        			{
-	                		tanks.get(input.id).moveForward(input.y * SPEED);
-	        			}
+	                	
+	                	playerWallCollision(input, SPEED);
+	                	
 	                	time = (System.nanoTime() / 1000000) - start;
 	                	if (input.shoot) {
-	                		System.out.println(time);
-	                		// one second
-	                		if (time > 1000) {
+	                		// 2000 = 2 seconds.
+	                		if (time > 2000) {
 	                			start = System.nanoTime() / 1000000;
 	                			time = 0;
-			            		System.out.println("shoot");
-			            		float x = (float) (tank.getX() + (Tank.width / 2) + tank.getDirectionX() * 50);
-			            		float y = (float) (tank.getY() + (Tank.height / 2) - tank.getDirectionY() * 50);
-			            		bullet_lock.lock();
-			            		bullets.add(new Bullet(x, y, tank.getRotate(), tanks.get(tank.getID()).getShootSpeed()));
-			            		bullet_lock.unlock();
+	                    		float x = (float) (tank.getX() + (Tank.width / 2) + tank.getDirectionX() * 50);
+	                    		float y = (float) (tank.getY() + (Tank.height / 2) - tank.getDirectionY() * 50);
+	                    		bulletLock.lock();
+	                    		bullets.add(new Bullet(x, y, tank.getRotate(), tanks.get(tank.getID()).getShootSpeed()));
+	                    		bulletLock.unlock();
 	                		}
 	                	}
-	                	for (ObjectOutputStream o: sq)
-	                	{
-	                    	InputPacket to_client = new InputPacket(input.id, 
-	                    			tanks.get(input.id).getX(), tanks.get(input.id).getY(),
-	                    			tanks.get(input.id).getRotate(), false);
-	                    	to_client.armor = tanks.get(input.id).getArmor();
-	    					o.writeObject(to_client);
-	    					o.flush();
-	                	}
+
+	                	sendPacketToPlayers(input);
                 	}
-                	tank_lock.unlock();
+                	tankLock.unlock();
                 }
             }
-            catch (Exception e) {
-                System.out.println("Error:" + socket);
-            } 
+            catch (Exception e) {} 
             finally {
-            	sockets.remove(socket);
-            	sq.remove(out);
-            	if (new_id > -1)
-            		tanks.remove(new_id);
-            	clients--;
-            	
-				// kill tank
-				InputPacket tank_delete = new InputPacket(new_id, 0, 0, 0, false);
-				tank_delete.delete = true;
-				for (var client : sq) {
-					try {
-						client.writeObject(tank_delete);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
+            	cleanTank(newID, out);
             }
+        }
+        
+        /**
+         * Add tanks to the new client.
+         * 
+         * @param newID		an int for the new client's tank ID.
+         * @param armor		an int for the new tank's armor type.
+         * @param shootSpd	an int for the new tank's shooting speed.
+         * @param out		an ObjectOutputStream to send data out to the client.
+         */
+        private void addNewTank(int newID, int armor, int shootSpd, ObjectOutputStream out) {
+        	 // add new tank
+        	InputPacket initial_tank = new InputPacket(newID, initialX, initialY, initialAng, false);
+        	initial_tank.armor = armor;
+        	try {
+        		out.writeObject(initial_tank);
+
+        		for (ObjectOutputStream client : outs) {
+        			if (client != out)
+        				client.writeObject(initial_tank);
+        		}
+        		// send num of tanks
+        		out.writeObject(tanks.size());
+        		// loop through all tanks and send
+        		for (var key : tanks.keySet()) {
+        			InputPacket packet = new InputPacket(tanks.get(key).getID(),
+        					tanks.get(key).getX(), tanks.get(key).getY(), tanks.get(key).getRotate(), false);
+        			packet.armor = tanks.get(key).getArmor();
+        			out.writeObject(packet);
+        		}
+        	} catch (IOException e) {}
+        	
+        	tanks.put(newID, new Tank(initialX, initialY, newID, maxLives, armor));
+        	tanks.get(newID).setShootSpeed(shootSpd);
+        }
+        
+        private void playerWallCollision(InputPacket input, final int SPEED) {
+        	if (map.collision(tanks.get(input.id).getX(),
+    			tanks.get(input.id).getY(),
+    			tanks.get(input.id).getX() + (Tank.width),
+    			tanks.get(input.id).getY() + (Tank.height)))
+			{
+        		tanks.get(input.id).moveForward(input.y * SPEED);
+			}
+        }
+        
+        /**
+         * Send current player's tank information to other players.
+         * 
+         * @param input		an InputPacket to compile all data needed to send to
+         * 					other players.
+         */
+        private void sendPacketToPlayers(InputPacket input) {
+        	for (ObjectOutputStream o: outs) {
+            	InputPacket to_client = new InputPacket(input.id, 
+            			tanks.get(input.id).getX(), tanks.get(input.id).getY(),
+            			tanks.get(input.id).getRotate(), false);
+            	to_client.armor = tanks.get(input.id).getArmor();
+				try {
+					o.writeObject(to_client);
+					o.flush();
+				} catch (IOException e) {}
+        	}
+        }
+        
+        /**
+         * Clean the current socket's tank from the server and other clients.
+         * 
+         * @param newID		an int representing the tank to be cleaned.
+         * @param out		an ObjectOutputStream to send data to the clients.
+         */
+        private void cleanTank(int newID, ObjectOutputStream out) {
+        	sockets.remove(socket);
+        	outs.remove(out);
+        	if (newID > -1)
+        		tanks.remove(newID);
+        	clients--;
+        	
+			// kill tank
+			InputPacket tank_delete = new InputPacket(newID, 0, 0, 0, false);
+			tank_delete.delete = true;
+			for (ObjectOutputStream client : outs) {
+				try {
+					client.writeObject(tank_delete);
+				} catch (IOException e) {}
+			}
         }
     }
     

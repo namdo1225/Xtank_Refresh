@@ -18,7 +18,7 @@ public class InputPacket implements java.io.Serializable {
 	public int					angle;
 	public int					armor;
 	public boolean				shoot;
-	public boolean				is_bullet;
+	public boolean				isBullet;
 	public boolean 				delete;
 	
 	/**
@@ -46,7 +46,7 @@ public class InputPacket implements java.io.Serializable {
 		this.y = y;
 		this.angle = angle;
 		this.shoot = shoot;
-		this.is_bullet = false;
+		this.isBullet = false;
 		this.delete = false;
 		this.armor = 0;
 	}
