@@ -295,12 +295,15 @@ public class Server {
             	int armor_type = (Integer)in.readObject();
             	System.out.println("Model: " + armor_type);
             	int tank_armor = 0;
+            	int shoot_speed = 0;
             	switch (armor_type) {
             	case 1:
             		tank_armor = 3;
+            		shoot_speed = 10;
             		break;
             	case 2:
             		tank_armor = 2;
+            		shoot_speed = 20;
             		break;
             	}
                 // add new tank
@@ -322,13 +325,15 @@ public class Server {
             	}
             	//System.out.println(3);
             	tanks.put(new_id, new Tank(initial_x, initial_y, new_id, max_lives, tank_armor));
-            	
+            	tanks.get(new_id).setShootSpeed(shoot_speed);
             	System.out.println(tanks.get(new_id).getArmor() + " asfsdgf sdgregyregt");
             	//System.out.println(4);
             	
                 sq.add(out);
                 //System.out.println(5);
                 // send old tanks to new tank
+                long time = 0;
+                long start = System.nanoTime() / 1000000;
                 while (!socket.isClosed()) {
                 	InputPacket input = (InputPacket)in.readObject();
                 	// update tank position server side
@@ -346,13 +351,20 @@ public class Server {
 	        			{
 	                		tanks.get(input.id).moveForward(input.y * SPEED);
 	        			}
+	                	time = (System.nanoTime() / 1000000) - start;
 	                	if (input.shoot) {
-	                		System.out.println("shoot");
-	                		float x = (float) (tank.getX() + (Tank.width / 2) + tank.getDirectionX() * 50);
-	                		float y = (float) (tank.getY() + (Tank.height / 2) - tank.getDirectionY() * 50);
-	                		bullet_lock.lock();
-	                		bullets.add(new Bullet(x, y, tank.getRotate(), 10));
-	                		bullet_lock.unlock();
+	                		System.out.println(time);
+	                		// one second
+	                		if (time > 1000) {
+	                			start = System.nanoTime() / 1000000;
+	                			time = 0;
+			            		System.out.println("shoot");
+			            		float x = (float) (tank.getX() + (Tank.width / 2) + tank.getDirectionX() * 50);
+			            		float y = (float) (tank.getY() + (Tank.height / 2) - tank.getDirectionY() * 50);
+			            		bullet_lock.lock();
+			            		bullets.add(new Bullet(x, y, tank.getRotate(), tanks.get(tank.getID()).getShootSpeed()));
+			            		bullet_lock.unlock();
+	                		}
 	                	}
 	                	for (ObjectOutputStream o: sq)
 	                	{

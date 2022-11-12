@@ -16,6 +16,7 @@ public class Tank {
 	private int				lives;
 	private int				armor;
 	private int 			default_armor;
+	private int 			shoot_speed;
 	
 	private boolean			armorExist;
 	private boolean			firstSet;
@@ -23,6 +24,7 @@ public class Tank {
 	private int				tankBody;
 	private int				tankRotatorAndCannon;
 	private int				tankShield;
+	
 	
 	public static final int width = 25;
 	public static final int height = 50;
@@ -238,6 +240,14 @@ public class Tank {
 		return lives;
 	}
 	
+	
+	public void setShootSpeed(int shoot_speed) {
+		this.shoot_speed = shoot_speed;
+	}
+	
+	public int getShootSpeed() {
+		return shoot_speed;
+	}
 	/**
 	 * Returns true if box collides with tank.
 	 * 
