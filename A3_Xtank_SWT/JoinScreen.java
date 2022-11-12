@@ -182,8 +182,10 @@ public class JoinScreen extends Screen {
 		if (validateInput()) {
 			try {
 				cControl.createSocket(iP.getText(), Integer.parseInt(port.getText()));
-				if (cModel.getSocket() != null && cModel.getSocket().isConnected())
+				if (cModel.getSocket() != null && cModel.getSocket().isConnected()) {
+					error.setText("");
 					cControl.updateScreen(Mode.GAME);
+				}
 				else
 					error.setText("The server did not respond.");
 			} catch (Exception e) {}
