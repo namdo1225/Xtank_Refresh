@@ -1,3 +1,6 @@
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.eclipse.swt.SWT;
 
 /**
@@ -28,6 +31,7 @@ public class Tank {
 	
 	public static final int width = 25;
 	public static final int height = 50;
+	public static Lock client_lock = new ReentrantLock();
 	
 	/**
 	 * The first constructor for Tank.

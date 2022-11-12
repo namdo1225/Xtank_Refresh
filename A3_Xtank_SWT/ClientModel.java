@@ -316,6 +316,7 @@ public class ClientModel {
 							}
 						}
 						else {
+							Tank.client_lock.lock();
 							if (packet.x == -69 && packet.y == -69 && packet.angle == -69) {
 								winner = packet.id;								
 							}
@@ -337,6 +338,7 @@ public class ClientModel {
 									tanks.get(packet.id).set(packet.x, packet.y, packet.angle, packet.armor);
 								}
 							}
+							Tank.client_lock.unlock();
 						}
 					}
 				}

@@ -216,6 +216,7 @@ public class GameScreen extends Screen {
 		}
 		
 		//Tank tank = cModel.getTank();
+		Tank.client_lock.lock();
 		Map<Integer, Tank> tanks = cModel.getTanks();
 		for (var key : tanks.keySet()) {
 			
@@ -263,6 +264,7 @@ public class GameScreen extends Screen {
 			event.gc.drawText(String.valueOf(tank.getID()), x + 10, y+(w/2));
 			map.collision(x, y, x + h, y + h);
 		}
+		Tank.client_lock.unlock();
 	}
 	
 	/**
