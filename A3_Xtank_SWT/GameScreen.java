@@ -238,7 +238,7 @@ public class GameScreen extends Screen {
 			event.gc.setTransform(transform);
 			
 			// draw shield
-			if (tank.getArmor() >= 0) {
+			if (tank.getArmor() > 0) {
 				color3 = tank.getShield();
 				
 				event.gc.setBackground(compositeGame.getDisplay().getSystemColor(color3));
