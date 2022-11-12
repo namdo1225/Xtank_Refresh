@@ -128,7 +128,7 @@ public class GameScreen extends Screen {
 	private void makeCompPart2() {
 		canvas.addMouseListener(new MouseListener() {
 			public void mouseDown(MouseEvent e) {
-				System.out.println("mouseDown in canvas");
+				isConnected();
 			} 
 			public void mouseUp(MouseEvent e) {} 
 			public void mouseDoubleClick(MouseEvent e) {} 
