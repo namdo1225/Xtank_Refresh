@@ -284,6 +284,8 @@ public class ClientModel {
 		/**
 		 * A method to run the task, which is to get input and output
 		 * from the server.
+		 * 
+		 * @author Patrick Comden
 		 */
 		@Override
 		public void run() {
