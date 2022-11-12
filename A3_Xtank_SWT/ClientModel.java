@@ -127,12 +127,8 @@ public class ClientModel {
 
 			tank = new Tank(newTank.x, newTank.y, newTank.id, newTank.armor);
 			tanks.put(tank.getID(), tank);
-        } catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
+        } catch (ClassNotFoundException e) {}
+		catch (IOException e) {}
         
 		// if socket is connected to the server, create a thread to handle server/client input/output.
         if (socket.isConnected()) {        	
@@ -307,14 +303,7 @@ public class ClientModel {
 							handleTank(packet);
 					}
 				}
-				catch(IOException ex) {
-					System.out.println("The server did not respond (async).");
-					stop();
-				}
-				catch(NullPointerException ex) {
-					System.out.println("Nullptr error in ClientModel line ~141. This meant"
-							+ "server has closed socket communication due to player restriction"
-							+ "or other issue.");
+				catch(Exception ex) {
 					stop();
 				}
 			}
