@@ -145,8 +145,6 @@ public class GameScreen extends Screen {
             	time = (System.nanoTime() / 1000000) - start;
 				
 				if (isConnected() && time > 2000) {
-					System.out.println("input");
-					
         			start = System.nanoTime() / 1000000;
         			time = 0;
 					
