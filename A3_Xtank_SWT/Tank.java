@@ -268,7 +268,6 @@ public class Tank {
 	 * @return a boolean for whether the tank is still alive.
 	 */
 	public boolean hit() {
-		System.out.println("Tank " + id + " is hit, armor is now " + (armor - 1) + ". Lives is " + lives);
 		armor--;
 		if (armorExist && armor <= 0) {
 			lives--;
