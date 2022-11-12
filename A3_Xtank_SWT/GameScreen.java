@@ -315,7 +315,7 @@ public class GameScreen extends Screen {
 	 */
 	public boolean isConnected() {
 		if (!cControl.isConnected()) {
-			serverStatus.setText("Server\nCLOSED\nPlease\nQuit.");
+			serverStatus.setText("Server\nCLOSED\nOr\nWinner\nDecided.\nPlease\nQuit.");
 			serverStatus.setForeground(compositePlayer.getDisplay().getSystemColor(SWT.COLOR_RED));
 			
 			cControl.endGame();
