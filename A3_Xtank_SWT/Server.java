@@ -41,7 +41,8 @@ public class Server {
 	private static final int						initialAng = 0;
 	
     private static int								clients;
-	
+	private static int								winner;
+    
 	/**
 	 * Constructor for Server.
 	 * 
@@ -236,12 +237,12 @@ public class Server {
 			
 			// check if there is winner
 			if (tanks.size() == 1) { 
-				for (var winner_id : tanks.keySet()) {
+				for (Integer winnerID : tanks.keySet()) {
 					// -69 is out of range, reserved for winner
-					InputPacket winner_packet = new InputPacket(winner_id, -69, -69, -69, false);
+					InputPacket winnerPack = new InputPacket(winnerID, -69, -69, -69, false);
 					for (ObjectOutputStream client : outs) {
 						try {
-							client.writeObject(winner_packet);
+							client.writeObject(winnerPack);
 						} catch (IOException e) {}
 					}
 					
