@@ -161,8 +161,10 @@ public class Server {
 								int lives = tanks.get(key).getLives();
 								if (!tanks.get(key).hit()) {
 									playerIsHit(key);
-									closeServeMisc();
-									return;
+									if (tanks.size() < 2) {
+										closeServeMisc();
+										return;
+									}
 								}
 								else {
 									if (lives != tanks.get(key).getLives())
