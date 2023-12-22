@@ -1,3 +1,4 @@
+package model;
 /**
  * A class to that represents packaged information that can be sent
  * back and forth from the client and server.

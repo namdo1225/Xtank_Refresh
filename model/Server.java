@@ -6,6 +6,7 @@
  * @version	1.0
  * @since	2022-11-12
  */
+package model;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -41,7 +42,6 @@ public class Server {
 	private static final int						initialAng = 0;
 	
     private static int								clients;
-	private static int								winner;
     
 	/**
 	 * Constructor for Server.
@@ -331,10 +331,16 @@ public class Server {
             	int shootSpd = 0;
             	switch (armType) {
             	case 1:
-            		tankArm = 3; shootSpd = 10;
+            		tankArm = 1; shootSpd = 30;
             		break;
             	case 2:
             		tankArm = 2; shootSpd = 20;
+            		break;
+            	case 3:
+            		tankArm = 3; shootSpd = 10;
+            		break;
+            	case 4:
+            		tankArm = 4; shootSpd = 5;
             		break;
             	}
 

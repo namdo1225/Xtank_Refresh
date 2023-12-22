@@ -1,3 +1,10 @@
+package application;
+import controller.ClientController;
+import controller.HostController;
+import model.ClientModel;
+import model.HostModel;
+import view.XTankUI;
+
 /**
  * A class that has a main function to run the entire program.
  * It also links the model, view, and controller together.

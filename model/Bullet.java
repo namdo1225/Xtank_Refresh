@@ -1,3 +1,4 @@
+package model;
 /**
  * A class that represent bullets shot by the tanks. Includes
  * information about position, angle, etc. that makes sure it

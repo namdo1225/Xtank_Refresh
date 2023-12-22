@@ -8,6 +8,7 @@
  * @version	1.0
  * @since	2022-11-12
  */
+package view;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -16,6 +17,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+
+import controller.ClientController;
+import controller.HostController;
+import model.ClientModel;
+import model.HostModel;
+import model.Mode;
 
 public class XTankUI {
 	private static XTankUI			ui;
@@ -55,7 +62,7 @@ public class XTankUI {
 	public void start() {
 		display = new Display();
 		shell = new Shell(display);
-		shell.setText("A3_XTank");
+		shell.setText("XTank Refresh");
 		
 		layout = new GridLayout();
 		layout.numColumns = 1;

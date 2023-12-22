@@ -5,6 +5,7 @@
  * @version	1.0
  * @since	2022-11-12
  */
+package model;
 
 import org.eclipse.swt.SWT;
 
@@ -73,15 +74,27 @@ public class Tank {
 	 * game screen.
 	 */
 	private void setColorScheme() {
-		tankBody = SWT.COLOR_DARK_GREEN;
-		tankRotatorAndCannon = SWT.COLOR_BLACK;
-		tankShield = SWT.COLOR_DARK_BLUE;
-		
-		if (defaultArmor == 2) {
+		switch (defaultArmor) {
+		case 1:
+			tankBody = SWT.COLOR_DARK_GREEN;
+			tankRotatorAndCannon = SWT.COLOR_BLACK;
+			tankShield = SWT.COLOR_DARK_BLUE;
+			break;
+		case 2:
 			tankBody = SWT.COLOR_DARK_RED;
 			tankRotatorAndCannon = SWT.COLOR_GRAY;
 			tankShield = SWT.COLOR_DARK_YELLOW;
-
+			break;
+		case 3:
+			tankBody = SWT.COLOR_DARK_BLUE;
+			tankRotatorAndCannon = SWT.COLOR_DARK_RED;
+			tankShield = SWT.COLOR_DARK_MAGENTA;
+			break;
+		case 4:
+			tankBody = SWT.COLOR_DARK_MAGENTA;
+			tankRotatorAndCannon = SWT.COLOR_DARK_GREEN;
+			tankShield = SWT.COLOR_DARK_RED;
+			break;
 		}
 	}
 	
