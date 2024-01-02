@@ -2,6 +2,7 @@
   - Have you heard of the games [Tank (1990, NES)](https://www.retrogames.cz/play_1412-NES.php) or [XTank Online](https://toucharcade.com/games/xtank-online)? This Java project is a game based on those ideas. It uses the SWT graphics libraries and many Java packages in order to create a LAN multiplayer game where players could compete by trying to be the last surviving tank. Some features include the ability to select specific tank types and an intuitive UI.
 
 ## NOTE
+  - Make sure you have JRE 17 or later installed (usually requires JDK).
   - Graphics Library used: SWT
   - Developed and tested on Windows 10 and 11, 64-bit
   - Instructions to run it on the console are provided in "ExecutableJAR".
