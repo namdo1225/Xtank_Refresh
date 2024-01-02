@@ -1,4 +1,4 @@
-# Xtank_Refresh
+# Xtank Refresh
   - Have you heard of the games [Tank (1990, NES)](https://www.retrogames.cz/play_1412-NES.php) or [XTank Online](https://toucharcade.com/games/xtank-online)? This Java project is a game based on those ideas. It uses the SWT graphics libraries and many Java packages in order to create a LAN multiplayer game where players could compete by trying to be the last surviving tank. Some features include the ability to select specific tank types and an intuitive UI.
 
 ## NOTE
